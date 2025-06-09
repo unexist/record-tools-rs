@@ -1,0 +1,4 @@
+[config]
+file_type = "adoc"
+adr_dir = "./architecture-decision-record"
+tdr_dir = "./technical-debt-records"
