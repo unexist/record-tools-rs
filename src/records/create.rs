@@ -16,6 +16,7 @@ use std::time::SystemTime;
 use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
+use slugify::slugify;
 
 pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     if title.is_empty() {
@@ -23,14 +24,19 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     }
 
     // Load template
-    let file_path = format!("{}/{}-template.{}",
-                            config.template_dir, config.record_type, config.file_type);
+    let source_path = format!("{}/{}-template.{}",
+                              config.template_dir, config.record_type, config.file_type);
 
-    let content = std::fs::read_to_string(&file_path)
-        .with_context(|| format!("Failed to open file: {}", file_path))?;
+    let content = std::fs::read_to_string(&source_path)
+        .with_context(|| format!("Failed to open template file: {}", source_path))?;
 
     let template = Template::from(content.as_str());
+    
+    // Get number
+    let next_val = 1;
+    let next_val_str = format!("{}", next_val);
 
+    // Get time
     let odt: OffsetDateTime = SystemTime::now().into();
     let format = format_description!("[year]-[month]-[day]");
     let date = odt.format(&format)?;
@@ -38,17 +44,25 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     // Populate template
     let mut values = HashMap::<&str, &str>::new();
 
-    values.insert("NUMBER", "1");
+    values.insert("NUMBER", next_val_str.as_str());
     values.insert("TITLE", title.as_str());
     values.insert("DATE", date.as_str());
     values.insert("STATUS", "drafted");
 
     let result = template.fill_in(&values);
 
-    println!("{}", result);
+    // Write template
+    let target_path = format!("{}/{}-{}.{}",
+                              config.adr_dir, next_val_str, 
+                              slugify!(&*title), config.file_type);
 
-    println!("Created new decision record (title: {}, type: {}, superseded: {})",
-             title, config.record_type, config.superseded);
+    if config.dry_run {
+        println!("{}:\n{}", target_path, result);
+    } else {
+    }
+
+    println!("Created new decision record {} (dry-run: {}, superseded: {})",
+             target_path, config.dry_run, !config.superseded.is_empty());
     
     Ok(())
 }
