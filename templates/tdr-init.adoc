@@ -1,0 +1,48 @@
+= 1. Record architecture decisions
+
+|===
+| Proposed Date: | DATE
+| Decision Date: | ?
+| Proposer:      | NAME
+| Deciders:      | Christoph Kappel
+| Status:        | analyzed
+| Issues:        | ?
+| References:    |
+| Severity:      | high
+|===
+
+NOTE: *Status types:* identified | analyzed | approved | in progress | resolved | closed | rejected | superseded +
+      *Severity:* low | medium | high | critical
+
+== Context
+
+We need to record the technical debts made on this project.
+
+== Impact
+
+== Symptoms
+
+== Potential Risks
+
+== Proposed Solution
+
+Technical Debts Records as
+link:https://github.com/ms1963/TechnicalDebtRecords/[described by Michael Stal]
+might help us as a format.
+
+== Decision
+
+We will use Technical Debts Records.
+
+== Cost of Delay
+
+== Effort to Resolve
+
+== Dependencies
+
+== Further Information
+
+See the Michael Stal's repository, linked above.
+For a lightweight toolset, see Michael Stal's link:https://github.com/ms1963/TechnicalDebtRecords/[tdr-tools]
+
+== Comments

@@ -1,0 +1,58 @@
+# NUMBER. TITLE
+
+| Meta           | Value                                     |
+|----------------| ----------------------------------------- |
+| Proposed Date: | DATE                                      |
+| Decision Date: | ?                                         |
+| Proposer:      | NAMES                                     |
+| Deciders:      | NAMES                                     |
+| Status:        | STATUS                                    |
+| Issues:        | ?                                         |
+| References:    |                                           |
+| Severity:      | low                                       |
+
+> *Status types:* identified | analyzed | approved | in progress | resolved | closed | rejected | superseded  
+> *Severity:* low | medium | high | critical
+
+## Context
+
+Detailed background information, including why the debt was incurred (e.g., rushed deadlines, outdated technologies).
+
+## Impact
+
+- *Technical Impact*: How the debt affects system performance, scalability, maintainability, etc.
+- *Business Impact*: The repercussions on business operations, customer satisfaction, risk levels, etc.
+
+## Symptoms
+
+Observable signs indicating the presence of the technical debt (e.g., frequent bugs, slow performance).
+
+## Potential Risks
+
+Possible adverse outcomes if the debt remains unaddressed (e.g., security vulnerabilities, increased costs).
+
+## Proposed Solution
+
+Recommended actions or strategies to resolve the debt.
+
+## Decision
+
+The change that we're proposing or have agreed to implement.
+
+## Cost of Delay
+
+Consequences of postponing the resolution of the debt.
+
+## Effort to Resolve
+
+Estimated resources, time, and effort required to address the debt.
+
+## Dependencies
+
+Other tasks, components, or external factors that the resolution of the debt depends on.
+
+## Further Information
+
+Any other relevant information or considerations related to the debt.
+
+## Comments
