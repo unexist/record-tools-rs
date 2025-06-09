@@ -15,6 +15,19 @@ use std::path::Path;
 use std::process::Command;
 
 #[test]
+fn should_load_config_file() -> Result<(), Box<dyn std::error::Error>> {
+    let dir = Path::new(".");
+
+    Command::cargo_bin("rtrs")?
+        .current_dir(dir)
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Loaded config from:"));
+
+    Ok(())
+}
+
+#[test]
 fn should_show_help() -> Result<(), Box<dyn std::error::Error>> {
     let dir = Path::new(".");
 
@@ -29,14 +42,18 @@ fn should_show_help() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
-fn should_load_config_file() -> Result<(), Box<dyn std::error::Error>> {
+fn should_create_new_record() -> Result<(), Box<dyn std::error::Error>> {
     let dir = Path::new(".");
 
     Command::cargo_bin("rtrs")?
         .current_dir(dir)
+        .arg("create")
+        .arg("-t")
+        .arg("adr")
+        .arg("Test adr")
         .assert()
         .success()
-        .stdout(predicate::str::contains("Loaded config from:"));
+        .stdout(predicate::str::contains("Created new decision record (title: Test adr, type: adr"));
 
     Ok(())
 }
