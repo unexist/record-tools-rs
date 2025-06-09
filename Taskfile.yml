@@ -11,7 +11,7 @@ tasks:
 
   run:
     cmds:
-      - cargo run
+      - cargo run -- {{.CLI_ARGS}}
 
   clean:
     cmds:
