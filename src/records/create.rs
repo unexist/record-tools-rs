@@ -1,7 +1,7 @@
 ///
 /// @package record-tools-rs
 ///
-/// @file Main file
+/// @file Create new record
 /// @copyright 2025-present Christoph Kappel <christoph@unexist.dev>
 /// @version $Id$
 ///
@@ -12,5 +12,6 @@
 use crate::Config;
 
 pub(crate) fn create(title: String, config: &Config) {
-    println!("title: {}, superseded: {}", title, config.option_s);
+    println!("Created new decision record (title: {}, type: {}, superseded: {})",
+             title, config.record_type, config.superseded);
 }
