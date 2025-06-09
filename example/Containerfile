@@ -2,4 +2,4 @@ FROM docker.io/maven:3.9.6-eclipse-temurin-11-alpine
 
 MAINTAINER Christoph Kappel <christoph@unexist.dev>
 
-RUN apk add --no-cache sqlite graphviz
+RUN apk add --no-cache graphviz
