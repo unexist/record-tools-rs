@@ -10,8 +10,15 @@
 ///
 
 use crate::Config;
+use anyhow::Result;
 
-pub(crate) fn create(title: String, config: &Config) {
+pub(crate) fn create(title: String, config: &Config) -> Result<()> {
+    if title.is_empty() {
+        anyhow::bail!("Title cannot be empty");
+    }
+
     println!("Created new decision record (title: {}, type: {}, superseded: {})",
              title, config.record_type, config.superseded);
+    
+    Ok(())
 }
