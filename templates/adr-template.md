@@ -1,15 +1,15 @@
-# NUMBER. TITLE
+# ${NUMBER}. ${TITLE}
 
-| Meta           | Value                                     |
-| -------------- | ----------------------------------------- |
-| Proposed Date: | DATE                                      |
-| Decision Date: | ?                                         |
-| Proposer:      | NAMES                                     |
-| Deciders:      | NAMES                                     |
-| Status:        | STATUS                                    |
-| Issues:        | ?                                         |
-| References:    |                                           |
-| Priority:      | low                                       |
+| Meta           | Value          |
+| -------------- |----------------|
+| Proposed Date: | ${DATE}        |
+| Decision Date: | ?              |
+| Proposer:      | NAMES          |
+| Deciders:      | NAMES          |
+| Status:        | STATUS         |
+| Issues:        | ?              |
+| References:    |                |
+| Priority:      | low            |
 
 > *Status types:* drafted | proposed | rejected | accepted | deprecated | superseded  
 > *Priority:* low | medium | high

@@ -1,15 +1,15 @@
 # 1. Record architecture decisions
 
-| Meta           | Value                                     |
-|----------------| ----------------------------------------- |
-| Proposed Date: | DATE                                      |
-| Decision Date: | DATE                                      |
-| Proposer:      | NAMES                                     |
-| Deciders:      | NAMES                                     |
-| Status:        | drafted                                   |
-| Issues:        | ?                                         |
-| References:    |                                           |
-| Severity:      | high                                      |
+| Meta           | Value          |
+|----------------|----------------|
+| Proposed Date: | ${DATE}        |
+| Decision Date: | ${DATE}        |
+| Proposer:      | NAMES          |
+| Deciders:      | NAMES          |
+| Status:        | drafted        |
+| Issues:        | ?              |
+| References:    |                |
+| Severity:      | high           |
 
 > *Status types:* identified | analyzed | approved | in progress | resolved | closed | rejected | superseded  
 > *Severity:* low | medium | high | critical

@@ -1,7 +1,7 @@
 = 1. Record architecture decisions
 
 |===
-| Proposed Date: | DATE
+| Proposed Date: | ${DATE}
 | Decision Date: | ?
 | Proposer:      | NAMES
 | Deciders:      | ?
