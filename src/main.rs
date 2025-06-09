@@ -13,7 +13,6 @@
 mod records;
 
 use clap_config_file::ClapConfigFile;
-use crate::records::create::create;
 
 #[derive(ClapConfigFile)]
 #[config_file_name = "config"]
@@ -46,22 +45,30 @@ struct Config {
     commands: Vec<String>,
 }
 
-fn main() -> anyhow::Result<()> {
+fn handle_command(config: &Config) -> anyhow::Result<()> {
+    if !config.commands.is_empty() {
+        let subcmd = config.commands[0].as_str();
+        let remainder = config.commands[1..].join(" ").to_string();
+
+        match subcmd {
+            "create" => {
+                records::create::execute(remainder, &config)?;
+            },
+            _ => anyhow::bail!("Command not implemented yet"),
+        }
+    }
+
+    Ok(())
+}
+
+fn main() {
     let (config, path, _format) = Config::parse_info();
     
     println!("Loaded config from: {:?}", path.unwrap_or_default());
     println!("Config: {:?}", config);
     println!("Command: {:?}", config.commands);
 
-    if !config.commands.is_empty() {
-        match config.commands[0].as_str() {
-            "create" => {
-                create(config.commands[1..].join(" ").into(), &config)?;
-            },
-            _ => {}
-        }
-
+    if let Err(e) = handle_command(&config) {
+        eprintln!("Error: {}", e);
     }
-    
-    Ok(())
 }

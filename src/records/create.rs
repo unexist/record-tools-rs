@@ -17,7 +17,7 @@ use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
 
-pub(crate) fn create(title: String, config: &Config) -> Result<()> {
+pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     if title.is_empty() {
         anyhow::bail!("Title cannot be empty");
     }
