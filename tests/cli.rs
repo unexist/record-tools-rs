@@ -15,8 +15,21 @@ use std::path::Path;
 use std::process::Command;
 
 #[test]
+fn should_show_help() -> Result<(), Box<dyn std::error::Error>> {
+    let dir = Path::new(".");
+
+    Command::cargo_bin("rtrs")?
+        .current_dir(dir)
+        .arg("--help")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Usage: rtrs [OPTIONS] [commands]..."));
+
+    Ok(())
+}
+
+#[test]
 fn should_load_config_file() -> Result<(), Box<dyn std::error::Error>> {
-    // path to basic example
     let dir = Path::new(".");
 
     Command::cargo_bin("rtrs")?
