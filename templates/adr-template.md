@@ -6,7 +6,7 @@
 | Decision Date: | ?              |
 | Proposer:      | NAMES          |
 | Deciders:      | NAMES          |
-| Status:        | STATUS         |
+| Status:        | ${STATUS}      |
 | Issues:        | ?              |
 | References:    |                |
 | Priority:      | low            |
