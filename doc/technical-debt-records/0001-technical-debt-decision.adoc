@@ -1,0 +1,48 @@
+= 1. Record technical debt decisions
+
+|===
+| Proposed Date: | DATE
+| Decision Date: | ?
+| Proposer:      | NAMES
+| Deciders:      | ?
+| Status:        | identified
+| Issues:        | ?
+| References:    |
+| Severity:      | high
+|===
+
+NOTE: *Status types:* identified | analyzed | approved | in progress | resolved | closed | rejected | superseded +
+      *Severity:* low | medium | high | critical
+
+== Context
+
+We need to record the technical debts made on this project.
+
+== Impact
+
+== Symptoms
+
+== Potential Risks
+
+== Proposed Solution
+
+Technical Debt Records as
+link:https://github.com/ms1963/TechnicalDebtRecords/[described by Michael Stal]
+might help us as a format.
+
+== Decision
+
+We will use Technical Debt Records.
+
+== Cost of Delay
+
+== Effort to Resolve
+
+== Dependencies
+
+== Further Information
+
+See the Michael Stal's repository, linked above.
+For a lightweight toolset, see Michael Stal's link:https://github.com/ms1963/TechnicalDebtRecords/[tdr-tools]
+
+== Comments

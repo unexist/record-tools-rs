@@ -1,0 +1,15 @@
+stages:
+  - build
+
+default:
+  image: docker.io/unexist/record-builder:0.5
+  tags: [docs]
+
+update-help:
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'push' || $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - src/site/asciidoc/**/*
+  script:
+    - mvn -f pom.xml -P generate-docs-and-publish generate-resources

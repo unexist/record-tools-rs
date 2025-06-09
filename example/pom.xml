@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>dev.unexist.showcase</groupId>
+    <artifactId>record-tools-rs-documentation</artifactId>
+    <packaging>pom</packaging>
+    <version>0.1</version>
+
+    <properties>
+        <!-- Project -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Maven -->
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+
+        <!-- Workaround to get a proper timestamp -->
+        <timestamp>${maven.build.timestamp}</timestamp>
+
+        <asciidoctorj.diagram.version>2.3.0</asciidoctorj.diagram.version>
+        <asciidoctor.maven-plugin.version>3.0.0</asciidoctor.maven-plugin.version>
+        <maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
+        <maven-site-plugin.version>4.0.0-M14</maven-site-plugin.version>
+        <exec-maven-plugin.version>3.2.0</exec-maven-plugin.version>
+
+        <confluence.publisher.version>0.22.0</confluence.publisher.version>
+
+        <sourceDirectory>./src/site/asciidoc</sourceDirectory>
+        <outputDirectory>./target/static/documentation</outputDirectory>
+        <asciidocDirectory>./src/site/asciidoc</asciidocDirectory>
+
+        <!-- Confluence config -->
+        <!-- NOTE: Be careful with the ancestorID, everything will be overwritten -->
+        <confluence.url>${env.CONFLUENCE_URL}</confluence.url>
+        <confluence.publishingStrategy>APPEND_TO_ANCESTOR</confluence.publishingStrategy>
+
+        <!-- Provide these values from env; don't commit them! -->
+        <confluence.spaceKey>${env.CONFLUENCE_SPACE}</confluence.spaceKey>
+        <confluence.ancestorId>${env.CONFLUENCE_ANCESTOR}</confluence.ancestorId>
+        <confluence.publisherUserName>${env.CONFLUENCE_USER}</confluence.publisherUserName>
+        <confluence.publisherPassword>${env.CONFLUENCE_TOKEN}</confluence.publisherPassword>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>Apache License v2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>unexist</id>
+            <organization>dev.unexist</organization>
+        </developer>
+    </developers>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>${exec-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>bash</executable>
+                    <arguments>
+                        <argument>-c</argument>
+                        <argument>
+                            ${basedir}/../src/record-adr generate database;
+                            ${basedir}/../src/record-adr generate index > ${basedir}/src/site/asciidoc/_adr_autogen.adoc;
+                            ${basedir}/../src/record-tdr generate index > ${basedir}/src/site/asciidoc/_tdr_autogen.adoc;
+                        </argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>generate-docs</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctor-maven-plugin</artifactId>
+                        <version>${asciidoctor.maven-plugin.version}</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-diagram</artifactId>
+                                <version>${asciidoctorj.diagram.version}</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <sourceDirectory>${sourceDirectory}</sourceDirectory>
+                            <outputDirectory>${outputDirectory}</outputDirectory>
+                            <preserveDirectories>true</preserveDirectories>
+                            <attributes>
+                                <!-- Uses the <img src="data:image/png;base64> syntax for diagrams -->
+                                <data-uri/>
+                                <!-- Allows access to remote files (eg. code on external GitHub) -->
+                                <imagesdir>./</imagesdir>
+                                <allow-uri-read>true</allow-uri-read>
+                            </attributes>
+                            <requires>
+                                <require>asciidoctor-diagram</require>
+                            </requires>
+                            <logHandler>
+                                <outputToConsole>true</outputToConsole>
+                                <failIf>
+                                    <severity>ERROR</severity>
+                                </failIf>
+                            </logHandler>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>generate-html-doc</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                                <configuration>
+                                    <backend>html5</backend>
+                                    <attributes>
+                                        <toc>left</toc>
+                                        <sectanchors>true</sectanchors>
+                                        <source-highlighter>highlight.js</source-highlighter>
+                                    </attributes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>generate-docs-and-publish</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sahli.asciidoc.confluence.publisher</groupId>
+                        <artifactId>asciidoc-confluence-publisher-maven-plugin</artifactId>
+                        <version>${confluence.publisher.version}</version>
+                        <configuration>
+                            <asciidocRootFolder>${asciidocDirectory}</asciidocRootFolder>
+                            <sourceEncoding>UTF-8</sourceEncoding>
+                            <rootConfluenceUrl>${confluence.url}</rootConfluenceUrl>
+                            <spaceKey>${confluence.spaceKey}</spaceKey>
+                            <ancestorId>${confluence.ancestorId}</ancestorId>
+                            <username>${confluence.publisherUserName}</username>
+                            <password>${confluence.publisherPassword}</password>
+                            <pageTitlePrefix xml:space="preserve"/>
+                            <publishingStrategy>${confluence.publishingStrategy}
+                            </publishingStrategy>
+                            <orphanRemovalStrategy>KEEP_ORPHANS</orphanRemovalStrategy>
+                            <pageTitleSuffix
+                                    xml:space="preserve"> [${project.version}]</pageTitleSuffix>
+                            <versionMessage>Version ${project.version}</versionMessage>
+                            <attributes>
+                                <version>${project.version}</version>
+                            </attributes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>publish-documentation</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>publish</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

@@ -1,0 +1,38 @@
+= 1. Record architecture decisions
+
+:1: https://unexist.blog/documentation/myself/2024/10/24/decision-records.html
+
+|===
+| Proposed Date: | 2024-10-24
+| Decision Date: | 2024-10-24
+| Proposer:      | Christoph Kappel
+| Deciders:      | Christoph Kappel
+| Status:        | accepted
+| Issues:        | none
+| References:    | none
+| Priority:      | high
+|===
+
+NOTE: *Status types:* drafted | proposed | rejected | accepted | deprecated | superseded +
+      *Priority:* low | medium | high
+
+== Context
+
+We need to record the architectural decisions made on this project.
+
+== Proposed Solution
+
+Architecture Decision Records as {1}[summarised by Christoph] might help us as a format.
+
+== Decision
+
+We will use Architecture Decision Records.
+
+== Consequences
+
+None foreseeable.
+
+== Further Information
+
+== Comments
+

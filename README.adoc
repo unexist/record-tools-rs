@@ -1,0 +1,12 @@
+= Record tools
+
+This project contains combined tools for Architecture Decision Records and Technical Debts Records - rewritten in Rust.
+
+== Links
+
+- https://unexist.blog/tag/adr.html
+- https://github.com/unexist/adr-tools
+- https://github.com/unexist/record-tools-rs
+- https://github.com/npryce/adr-tools
+- https://github.com/ms1963/TechnicalDebtRecords
+- https://www.heise.de/blog/Technical-Debt-Records-Dokumentation-technischer-Schulden-9876115.html
