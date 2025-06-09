@@ -10,9 +10,10 @@
 /// See the file LICENSE for details.
 ///
 
-mod create;
+mod records;
 
 use clap_config_file::ClapConfigFile;
+use crate::records::create::create;
 
 #[derive(ClapConfigFile)]
 #[config_file_name = "config"]
@@ -52,7 +53,7 @@ fn main() {
     if !config.commands.is_empty() {
         match config.commands[0].as_str() {
             "new" => {
-                create::create(config.commands[1..].join(" ").into(), &config);
+                create(config.commands[1..].join(" ").into(), &config);
             },
             _ => {}
         }
