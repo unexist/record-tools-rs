@@ -42,7 +42,7 @@ fn should_show_help() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
-fn should_create_new_record() -> Result<(), Box<dyn std::error::Error>> {
+fn should_create_new_record_dry() -> Result<(), Box<dyn std::error::Error>> {
     let dir = Path::new(".");
 
     Command::cargo_bin("rtrs")?
@@ -50,10 +50,11 @@ fn should_create_new_record() -> Result<(), Box<dyn std::error::Error>> {
         .arg("create")
         .arg("-t")
         .arg("adr")
-        .arg("Test adr")
+        .arg("--dry-run")
+        .arg("Test ADR")
         .assert()
         .success()
-        .stdout(predicate::str::contains("Created new decision record (title: Test adr, type: adr"));
+        .stdout(predicate::str::contains("Created new decision record ./architecture-decision-record/1-test-adr.adoc (superseded: false)"));
 
     Ok(())
 }
