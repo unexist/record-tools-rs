@@ -41,6 +41,10 @@ struct Config {
     #[config_arg(short = 's', accept_from = "cli_only")]
     superseded: String,
 
+    /// Just run and don't create files
+    #[config_arg(accept_from = "cli_only")]
+    dry_run: bool,
+
     #[config_arg(positional)]
     commands: Vec<String>,
 }
