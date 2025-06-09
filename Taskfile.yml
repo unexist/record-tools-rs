@@ -1,0 +1,18 @@
+version: '3'
+
+tasks:
+  test:
+    cmds:
+      - cargo test -- --nocapture
+
+  cap:
+    cmds:
+      - cargo test
+
+  run:
+    cmds:
+      - cargo run
+
+  clean:
+    cmds:
+      - cargo clean
