@@ -1,4 +1,5 @@
 [config]
 file_type = "adoc"
+template_dir = "./templates"
 adr_dir = "./architecture-decision-record"
 tdr_dir = "./technical-debt-records"
