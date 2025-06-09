@@ -32,12 +32,12 @@ struct Config {
     tdr_dir: String,
 
     /// Record type to create
-    #[config_arg(short = "t", accept_from = "cli_only")]
+    #[config_arg(short = 't', accept_from = "cli_only")]
     record_type: String,
 
-    /// Option s
-    #[config_arg(name = "s", short = "s", accept_from = "cli_only")]
-    option_s: bool,
+    /// Supersed old decision record
+    #[config_arg(short = 's', accept_from = "cli_only")]
+    superseded: String,
 
     #[config_arg(positional)]
     commands: Vec<String>,
@@ -52,7 +52,7 @@ fn main() {
 
     if !config.commands.is_empty() {
         match config.commands[0].as_str() {
-            "new" => {
+            "create" => {
                 create(config.commands[1..].join(" ").into(), &config);
             },
             _ => {}
