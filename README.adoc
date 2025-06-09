@@ -1,4 +1,4 @@
-= Record tools RS
+= Record tools (Rust edition)
 
 This project contains combined tools for Architecture Decision Records and Technical Debts Records - rewritten in Rust.
 
