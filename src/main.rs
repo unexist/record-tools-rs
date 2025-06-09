@@ -22,6 +22,9 @@ struct Config {
     /// Record file type
     #[config_arg(default_value = "adoc")]
     file_type: String,
+    
+    #[config_arg(default_value = "./templates")]
+    template_dir: String,
 
     /// Path to Architecture Decision Records
     #[config_arg(default_value = "./architecture-decision-record")]
@@ -43,7 +46,7 @@ struct Config {
     commands: Vec<String>,
 }
 
-fn main() {
+fn main() -> anyhow::Result<()> {
     let (config, path, _format) = Config::parse_info();
     
     println!("Loaded config from: {:?}", path.unwrap_or_default());
@@ -53,10 +56,12 @@ fn main() {
     if !config.commands.is_empty() {
         match config.commands[0].as_str() {
             "create" => {
-                create(config.commands[1..].join(" ").into(), &config);
+                create(config.commands[1..].join(" ").into(), &config)?;
             },
             _ => {}
         }
 
     }
+    
+    Ok(())
 }
