@@ -17,6 +17,7 @@ serde = { version = "1.0.219", features = ["derive"] }
 config = "0.15.11"
 anyhow = "1.0.98"
 text-template = "0.1.0"
+time = {version = "0.3.41", features = ["formatting", "macros"]}
 
 [dev-dependencies]
 assert_cmd = "2.0"
