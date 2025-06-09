@@ -9,23 +9,25 @@
 /// See the file LICENSE for details.
 ///
 
-use clap::Parser;
+use clap_config_file::ClapConfigFile;
 
-#[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
-struct Args {
-    #[arg(short, long)]
-    name: String,
+#[derive(ClapConfigFile)]
+#[config_file_name = "config"]
+#[config_file_formats = "yaml,toml,json"]
+struct Config {
+    #[config_arg(default_value = "adoc")]
+    file_type: String,
 
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
+    #[config_arg(default_value = "./architecture-decision-record")]
+    adr_dir: String,
+
+    #[config_arg(default_value = "./technical-debt-records")]
+    tdr_dir: String,
+
 }
 
 fn main() {
-    let args = Args::parse();
+    let (config, _used_file, _format) = Config::parse_info();
 
-    for _ in 0..args.count {
-        println!("Hello {}!", args.name);
-    }
+    println!("Config: {:?}", config);
 }
-
