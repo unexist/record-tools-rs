@@ -67,7 +67,7 @@ fn sanity_checks(config: &Config) -> Result<()> {
     Ok(())
 }
 
-fn handle_command(config: &Config) -> anyhow::Result<()> {
+fn handle_command(config: &Config) -> Result<()> {
     if !config.commands.is_empty() {
         let subcmd = config.commands[0].as_str();
         let remainder = config.commands[1..].join(" ").to_string();
