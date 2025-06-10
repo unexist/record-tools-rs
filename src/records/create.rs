@@ -12,6 +12,8 @@
 use crate::Config;
 use anyhow::{Context, Result};
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Write;
 use std::time::SystemTime;
 use text_template::Template;
 use time::OffsetDateTime;
@@ -57,8 +59,13 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
                               slugify!(&*title), config.file_type);
 
     if config.dry_run {
-        println!("{}:\n{}", target_path, result);
+        println!("Dry-run: {}:\n{}", target_path, result);
     } else {
+        let mut file = File::create_new(&target_path)
+            .with_context(|| format!("Failed to create new file: {}", target_path))?;
+        
+        file.write_all(result.to_string().as_bytes())
+            .with_context(|| format!("Failed to write to file: {}", target_path))?;
     }
 
     println!("Created new decision record {} (dry-run: {}, superseded: {})",
