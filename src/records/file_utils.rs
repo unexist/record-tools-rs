@@ -18,7 +18,8 @@ pub fn find_next_val(path: &str) -> Result<i16> {
         .max_by_key(|x| x.file_name());
     
     if let Some(file) = last_file {
-        return Ok(String::from(&file.file_name().to_str().unwrap()[0..4]).parse::<i16>()?);
+        return Ok(String::from(&file.file_name().to_str()
+            .unwrap_or_default()[0..4]).parse::<i16>()?);
     }
     
     Err(anyhow!("Failed to parse file name"))
