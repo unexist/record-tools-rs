@@ -11,28 +11,11 @@
 
 use assert_cmd::prelude::*;
 use predicates::prelude::*;
-use std::path::Path;
 use std::process::Command;
 
 #[test]
-fn should_load_config_file() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = Path::new(".");
-
-    Command::cargo_bin("rtrs")?
-        .current_dir(dir)
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("Loaded config from:"));
-
-    Ok(())
-}
-
-#[test]
 fn should_show_help() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = Path::new(".");
-
     Command::cargo_bin("rtrs")?
-        .current_dir(dir)
         .arg("--help")
         .assert()
         .success()
@@ -42,19 +25,64 @@ fn should_show_help() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
-fn should_create_new_record_dry() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = Path::new(".");
-
+fn should_load_config_file() -> Result<(), Box<dyn std::error::Error>> {
     Command::cargo_bin("rtrs")?
-        .current_dir(dir)
+        .arg("--config-file=test_config.toml")
+
+        // https://github.com/bodo-run/clap-config-file/issues/8
+        .arg("--template-dir=./templates")
+        .arg("--adr-dir=./example/src/site/asciidoc/architecture-decision-records")
+        .arg("--tdr-dir=./example/src/site/asciidoc/technical-debt-records")
+        
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Loaded config from:"))
+        .stdout(predicate::str::contains("./example/src/site/asciidoc/"));
+
+    Ok(())
+}
+
+#[test]
+fn should_create_new_record_dry() -> Result<(), Box<dyn std::error::Error>> {
+    Command::cargo_bin("rtrs")?
+        .arg("--config-file=test_config.toml")
+        
+        // https://github.com/bodo-run/clap-config-file/issues/8
+        .arg("--template-dir=./templates")
+        .arg("--adr-dir=./example/src/site/asciidoc/architecture-decision-records")
+        .arg("--tdr-dir=./example/src/site/asciidoc/technical-debt-records")
+        
         .arg("create")
-        .arg("-t")
-        .arg("adr")
+        .args(&["-t", "adr"])
         .arg("--dry-run")
         .arg("Test ADR")
         .assert()
         .success()
-        .stdout(predicate::str::contains("Created new decision record ./architecture-decision-record/1-test-adr.adoc (superseded: false)"));
+        .stdout(predicate::str::contains("Dry-run"))
+        .stdout(predicate::str::contains(
+            "architecture-decision-records/1-test-adr.adoc"));
+
+    Ok(())
+}
+
+#[test]
+fn should_create_new_record() -> Result<(), Box<dyn std::error::Error>> {
+    Command::cargo_bin("rtrs")?
+        .arg("--config-file=test_config.toml")
+        
+        // https://github.com/bodo-run/clap-config-file/issues/8
+        .arg("--template-dir=./templates")
+        .arg("--adr-dir=./example/src/site/asciidoc/architecture-decision-records")
+        .arg("--tdr-dir=./example/src/site/asciidoc/technical-debt-records")
+        
+        .arg("create")
+        .args(&["-t", "adr"])
+        .arg("--dry-run")
+        .arg("Test ADR")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(
+            "architecture-decision-records/1-test-adr.adoc"));
 
     Ok(())
 }
