@@ -38,6 +38,10 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     let next_val = 1;
     let next_val_str = format!("{}", next_val);
 
+    //let val = file_utils::find_next_val(&*config.adr_dir);
+
+    //println!("{:?}", val);
+
     // Get time
     let odt: OffsetDateTime = SystemTime::now().into();
     let format = format_description!("[year]-[month]-[day]");
