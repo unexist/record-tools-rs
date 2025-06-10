@@ -60,7 +60,7 @@ fn should_create_new_record_dry() -> Result<(), Box<dyn std::error::Error>> {
         .success()
         .stdout(predicate::str::contains("Dry-run"))
         .stdout(predicate::str::contains(
-            "architecture-decision-records/1-test-adr.adoc"));
+            "architecture-decision-records/0001-test-adr.adoc"));
 
     Ok(())
 }
@@ -82,7 +82,7 @@ fn should_create_new_record() -> Result<(), Box<dyn std::error::Error>> {
         .assert()
         .success()
         .stdout(predicate::str::contains(
-            "architecture-decision-records/1-test-adr.adoc"));
+            "architecture-decision-records/0001-test-adr.adoc"));
 
     Ok(())
 }

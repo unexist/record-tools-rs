@@ -54,8 +54,8 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     let result = template.fill_in(&values);
 
     // Write template
-    let target_path = format!("{}/{}-{}.{}",
-                              config.adr_dir, next_val_str, 
+    let target_path = format!("{}/{:04}-{}.{}",
+                              config.adr_dir, next_val, 
                               slugify!(&*title), config.file_type);
 
     if config.dry_run {
