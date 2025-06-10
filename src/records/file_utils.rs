@@ -12,15 +12,14 @@
 use anyhow::{anyhow, Result};
 
 pub fn find_next_val(path: &str) -> Result<i16> {
-    let last_file = std::fs::read_dir(path)
-        .expect("Couldn't access local directory")
+    let last_file = std::fs::read_dir(path)?
         .flatten()
         .filter(|f| f.metadata().unwrap().is_file()) 
         .max_by_key(|x| x.file_name());
     
     if let Some(file) = last_file {
-        return Ok(file.file_name().to_str().unwrap().parse::<i16>()?);
+        return Ok(String::from(&file.file_name().to_str().unwrap()[0..4]).parse::<i16>()?);
     }
     
-    Err(anyhow!("Meh"))
+    Err(anyhow!("Failed to parse file name"))
 }
