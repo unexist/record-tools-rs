@@ -1,4 +1,3 @@
-[config]
 file_type = "adoc"
 template_dir = "./templates"
 adr_dir = "./examples/src/site/asciidoc/architecture-decision-record"
