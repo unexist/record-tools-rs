@@ -24,7 +24,8 @@ struct Config {
     /// Record file type
     #[config_arg(default_value = "adoc")]
     file_type: String,
-    
+
+    /// Path to templates
     #[config_arg(default_value = "./templates")]
     template_dir: String,
 
@@ -75,7 +76,7 @@ fn handle_command(config: &Config) -> anyhow::Result<()> {
             "create" => {
                 records::create::execute(remainder, &config)?;
             },
-            _ => anyhow::bail!("Command not implemented yet"),
+            _ => bail!("Command not implemented yet"),
         }
     }
 
