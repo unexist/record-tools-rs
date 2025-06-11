@@ -13,6 +13,6 @@
 use anyhow::Result;
 use crate::Config;
 
-pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
+pub(crate) fn execute(_title: String, _config: &Config) -> Result<()> {
     Ok(())
 }
