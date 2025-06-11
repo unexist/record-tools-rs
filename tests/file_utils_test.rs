@@ -19,6 +19,7 @@ fn should_find_next_number() {
 
     let number = file_utils::find_next_val(&*path);
     
+    // Todo: Refactor once assert_matches is stable
     assert!(number.is_ok());
     assert_eq!(number.unwrap(), 1);
 }

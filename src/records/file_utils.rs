@@ -9,17 +9,20 @@
 /// See the file LICENSE for details.
 ///
 
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 
 pub fn find_next_val(path: &str) -> Result<i16> {
-    let last_file = std::fs::read_dir(path)?
+    let last_entry = std::fs::read_dir(path)?
         .flatten()
         .filter(|f| f.metadata().unwrap().is_file()) 
         .max_by_key(|x| x.file_name());
     
-    if let Some(file) = last_file {
-        return Ok(String::from(&file.file_name().to_str()
-            .unwrap_or_default()[0..4]).parse::<i16>()?);
+    if let Some(entry) = last_entry {
+        let number = entry.file_name().to_str()
+            .with_context(|| format!("Could not convert {:?} to string", entry.file_name()))?
+            .chars().take(4).collect::<String>();
+        
+        return number.parse::<i16>().map_err(anyhow::Error::from);
     }
     
     Err(anyhow!("Failed to parse file name"))
