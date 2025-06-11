@@ -76,7 +76,6 @@ fn should_create_new_record() -> Result<(), Box<dyn std::error::Error>> {
         
         .arg("create")
         .args(&["-t", "adr"])
-        .arg("--dry-run")
         .arg("Test ADR")
         .assert()
         .success()

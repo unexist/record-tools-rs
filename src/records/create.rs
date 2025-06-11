@@ -10,7 +10,7 @@
 ///
 
 use crate::Config;
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
@@ -19,10 +19,11 @@ use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
 use slugify::slugify;
+use crate::records::file_utils;
 
 pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     if title.is_empty() {
-        anyhow::bail!("Title cannot be empty");
+        bail!("Title cannot be empty");
     }
 
     // Load template
@@ -35,12 +36,8 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     let template = Template::from(content.as_str());
     
     // Get number
-    let next_val = 1;
-    let next_val_str = format!("{}", next_val);
-
-    //let val = file_utils::find_next_val(&*config.adr_dir);
-
-    //println!("{:?}", val);
+    let next_num = file_utils::find_next_num(&*config.adr_dir)?;
+    let next_num_str = format!("{}", next_num);
 
     // Get time
     let odt: OffsetDateTime = SystemTime::now().into();
@@ -50,7 +47,7 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     // Populate template
     let mut values = HashMap::<&str, &str>::new();
 
-    values.insert("NUMBER", next_val_str.as_str());
+    values.insert("NUMBER", next_num_str.as_str());
     values.insert("TITLE", title.as_str());
     values.insert("DATE", date.as_str());
     values.insert("STATUS", "drafted");
@@ -58,8 +55,7 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     let result = template.fill_in(&values);
 
     // Write template
-    let target_path = format!("{}/{:04}-{}.{}",
-                              config.adr_dir, next_val, 
+    let target_path = format!("{}/{:04}-{}.{}", config.adr_dir, next_num,
                               slugify!(&*title), config.file_type);
 
     if config.dry_run {
