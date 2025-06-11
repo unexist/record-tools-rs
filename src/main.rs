@@ -73,6 +73,9 @@ fn handle_command(config: &Config) -> Result<()> {
         let remainder = config.commands[1..].join(" ").to_string();
 
         match subcmd {
+            "init" => {
+                records::init::execute(remainder, &config)?;
+            },
             "create" => {
                 records::create::execute(remainder, &config)?;
             },

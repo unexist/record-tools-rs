@@ -1,14 +1,18 @@
 ///
 /// @package record-tools-rs
 ///
-/// @file Mod file
+/// @file Create new record
 /// @copyright 2025-present Christoph Kappel <christoph@unexist.dev>
 /// @version $Id$
 ///
 /// This program can be distributed under the terms of the GNU GPLv3.
 /// See the file LICENSE for details.
 ///
+/// 
 
-pub(crate) mod create;
-pub(crate) mod file_utils;
-pub(crate) mod init;
+use anyhow::Result;
+use crate::Config;
+
+pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
+    Ok(())
+}
