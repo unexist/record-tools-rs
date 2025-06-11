@@ -12,14 +12,28 @@
 #[path = "../src/records/file_utils.rs"]
 mod file_utils;
 
-#[test]
-fn should_find_next_number() {
-    let path = format!("{}/{}", env!("CARGO_MANIFEST_DIR"),
-                       "example/src/site/asciidoc/architecture-decision-records");
+use std::fs::File;
+use std::path::Path;
+use proptest::prelude::*;
+use tempfile::TempDir;
 
-    let number = file_utils::find_next_val(&*path);
-    
-    // Todo: Refactor once assert_matches is stable
-    assert!(number.is_ok());
-    assert_eq!(number.unwrap(), 1);
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(5))]
+    #[test]
+    fn should_find_next_file_number(n in 1u16..20) {
+        let temp_dir = TempDir::new()?;
+        
+        for i in 1..n {
+            File::create(
+                Path::new(&temp_dir.path().join(format!("{:04}-test-adr.adoc", i))))
+                .expect("Can't create file");
+        }
+
+        let number = file_utils::find_next_num(temp_dir.path().to_str()
+            .expect("Can't get path of temp dir"));
+
+        // Todo: Refactor once assert_matches is stable
+        assert!(number.is_ok());
+        assert_eq!(number.unwrap(), n);
+    }
 }
