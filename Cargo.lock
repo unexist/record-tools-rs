@@ -841,6 +841,7 @@ dependencies = [
  "config 0.15.11",
  "predicates",
  "proptest",
+ "regex",
  "serde",
  "slugify",
  "tempfile",

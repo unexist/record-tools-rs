@@ -19,6 +19,7 @@ anyhow = "1.0.98"
 text-template = "0.1.0"
 time = {version = "0.3.41", features = ["formatting", "macros"]}
 slugify = "0.1.0"
+regex = "1.11.1"
 
 [dev-dependencies]
 assert_cmd = "2.0"
