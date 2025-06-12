@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 ///
 /// @package record-tools-rs
 ///
@@ -30,15 +29,15 @@ pub fn find_next_num(path: &str) -> Result<u16> {
     Ok(1)
 }
 
-fn extract_field(path: &str, name: &str) -> Result<String> {
+pub fn extract_field(path: &str, name: &str) -> Result<String> {
     let content = std::fs::read_to_string(&path)
         .with_context(|| format!("Failed to open template file: {}", path))?;
 
     let re = Regex::new(&*format!("{}:[ |](.*)", name))?;
 
-    re.captures(&content).map(|caps| caps.extract())
-}
+    if let Some((_, [result])) = re.captures(&content).map(|caps| caps.extract()) {
+        return Ok(String::from(result));
+    }
 
-pub fn get_title(&self) -> Option<&String> {
-    self.meta.get("title")
+    Err(anyhow!("Couldn't find field"))
 }
