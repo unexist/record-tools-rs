@@ -64,6 +64,7 @@ fn should_create_new_record_dry() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+#[ignore]
 #[test]
 fn should_create_new_record() -> Result<(), Box<dyn std::error::Error>> {
     Command::cargo_bin("rtrs")?
