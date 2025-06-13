@@ -32,6 +32,9 @@ nb-configuration.xml
 target/
 release.properties
 
+# Rust
+**/*.proptest-regressions
+
 # Records
 **/_*_autogen.adoc
 _records.db
