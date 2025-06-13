@@ -14,6 +14,7 @@ use anyhow::{bail, Context, Result};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
+use std::path::PathBuf;
 use std::time::SystemTime;
 use text_template::Template;
 use time::OffsetDateTime;
@@ -36,7 +37,7 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     let template = Template::from(content.as_str());
     
     // Get number
-    let next_num = file_utils::find_next_num(&*config.adr_dir)?;
+    let next_num = file_utils::find_next_num(&PathBuf::from(&config.adr_dir))?;
     let next_num_str = format!("{}", next_num);
 
     // Get time
