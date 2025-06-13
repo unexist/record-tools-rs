@@ -42,9 +42,7 @@ proptest! {
         let temp_dir = create_n_records(n, None)
             .expect("Can't create temp dir");
 
-
-        let number = file_utils::find_next_num(temp_dir.path().to_str()
-            .expect("Can't get path of temp dir"));
+        let number = file_utils::find_next_num(&temp_dir.path());
 
         // Todo: Refactor once assert_matches is stable
         assert!(number.is_ok());
@@ -55,11 +53,12 @@ proptest! {
 proptest! {
     #![proptest_config(ProptestConfig::with_cases(5))]
     #[test]
-    fn should_extract_field(n in 1u16..20) {
+    fn should_extract_field(n in 1u16..5) {
         let temp_dir = create_n_records(1, Some("| Status: | drafted"))
             .expect("Can't create temp dir");
         
-        let field = file_utils::extract_field(temp_dir.path().to_str().unwrap(), "Status");
+        let field = file_utils::extract_field(
+            Path::new(&temp_dir.path().join(format!("{:04}-test-adr.adoc", n))), "Status");
 
         // Todo: Refactor once assert_matches is stable
         assert!(field.is_ok());
