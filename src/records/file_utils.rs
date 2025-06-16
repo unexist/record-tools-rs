@@ -35,8 +35,6 @@ pub fn extract_field(path: &Path, name: &str) -> Result<String> {
         .with_context(|| format!("Failed to open template file: {}", 
                                  path.to_str().unwrap_or_default()))?;
     
-    println!("{}", content);
-
     let re = Regex::new(&*format!("{}:[ |](.*)", name))?;
 
     if let Some((_, [result])) = re.captures(&content).map(|caps| caps.extract()) {
