@@ -9,6 +9,12 @@ tasks:
     cmds:
       - cargo test
 
+  trace:
+    env:
+      RUST_BACKTRACE: 1
+    cmds:
+      - cargo test
+
   run:
     cmds:
       - cargo run -- {{.CLI_ARGS}}
