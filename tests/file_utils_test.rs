@@ -12,10 +12,10 @@
 #[path = "../src/records/file_utils.rs"]
 mod file_utils;
 
+use proptest::prelude::*;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-use proptest::prelude::*;
 use tempfile::TempDir;
 use anyhow::Result;
 
@@ -24,8 +24,7 @@ fn create_n_records(n: u16, content: Option<&str>) -> Result<TempDir> {
     
     for i in 1..n {
         let mut file = File::create(
-            Path::new(&temp_dir.path().join(format!("{:04}-test-adr.adoc", i))))
-            .expect("Can't create file");
+            Path::new(&temp_dir.path().join(format!("{:04}-test-adr.adoc", i))))?;
         
         if content.is_some() {
             file.write_all(content.unwrap_or_default().as_bytes())?;
@@ -54,12 +53,12 @@ proptest! {
     #![proptest_config(ProptestConfig::with_cases(5))]
     #[test]
     fn should_extract_field(n in 1u16..5) {
-        let temp_dir = create_n_records(1, Some("| Status: | drafted"))
+        let temp_dir = create_n_records(n, Some("| Status: | drafted"))
             .expect("Can't create temp dir");
         
         let field = file_utils::extract_field(
-            Path::new(&temp_dir.path().join(format!("{:04}-test-adr.adoc", n))), "Status");
-
+            &temp_dir.path().join(format!("{:04}-test-adr.adoc", n)), "Status");
+        
         // Todo: Refactor once assert_matches is stable
         assert!(field.is_ok());
         assert_eq!(field.unwrap(), "drafted");
