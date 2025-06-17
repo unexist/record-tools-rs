@@ -28,6 +28,7 @@ fn create_n_records(n: u16, content: Option<&str>) -> Result<TempDir> {
         
         if content.is_some() {
             file.write_all(content.unwrap_or_default().as_bytes())?;
+            file.flush()?;
         }
     }
     
