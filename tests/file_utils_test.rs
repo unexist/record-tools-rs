@@ -19,12 +19,18 @@ use std::path::Path;
 use tempfile::TempDir;
 use anyhow::Result;
 
+macro_rules! file_pattern_str {
+    () => {
+        "{:04}-test-adr.adoc"
+    };
+}
+
 fn create_n_records(n: u16, content: Option<&str>) -> Result<TempDir> {
     let temp_dir = TempDir::new()?;
     
     for i in 1..n {
         let mut file = File::create(
-            Path::new(&temp_dir.path().join(format!("{:04}-test-adr.adoc", i))))?;
+            Path::new(&temp_dir.path().join(format!(file_pattern_str!(), i))))?;
         
         if content.is_some() {
             file.write_all(content.unwrap_or_default().as_bytes())?;
@@ -58,7 +64,9 @@ proptest! {
             .expect("Can't create temp dir");
         
         let field = file_utils::extract_field(
-            &temp_dir.path().join(format!("{:04}-test-adr.adoc", n)), "Status");
+            &temp_dir.path().join(format!(file_pattern_str!(), n)), "Status");
+
+        println!("{:?}", field);
         
         // Todo: Refactor once assert_matches is stable
         assert!(field.is_ok());
