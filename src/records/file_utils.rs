@@ -16,25 +16,25 @@ use regex::Regex;
 pub fn find_next_num(path: &Path) -> Result<u16> {
     let last_entry = std::fs::read_dir(path)?
         .flatten()
-        .filter(|f| f.metadata().unwrap().is_file()) 
+        .filter(|f| f.metadata().unwrap().is_file())
         .max_by_key(|x| x.file_name());
-    
+
     if let Some(entry) = last_entry {
         let number = entry.file_name().to_str()
             .with_context(|| format!("Couldn't convert {:?} to string", entry.file_name()))?
             .chars().take(4).collect::<String>();
-        
+
         return number.parse::<u16>().map_err(anyhow::Error::from).map(|i| i + 1);
     }
-    
+
     Ok(1)
 }
 
 pub fn extract_field(path: &Path, name: &str) -> Result<String> {
     let content = std::fs::read_to_string(&path)
-        .with_context(|| format!("Failed to open template file: {}", 
+        .with_context(|| format!("Failed to open template file: {}",
                                  path.to_str().unwrap_or_default()))?;
-    
+
     let re = Regex::new(&*format!("{}:[ |](.*)", name))?;
 
     if let Some((_, [result])) = re.captures(&content).map(|caps| caps.extract()) {

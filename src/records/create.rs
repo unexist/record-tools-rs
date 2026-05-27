@@ -35,7 +35,7 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
         .with_context(|| format!("Failed to open template file: {}", source_path))?;
 
     let template = Template::from(content.as_str());
-    
+
     // Get number
     let next_num = file_utils::find_next_num(&PathBuf::from(&config.adr_dir))?;
     let next_num_str = format!("{}", next_num);
@@ -64,13 +64,13 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     } else {
         let mut file = File::create_new(&target_path)
             .with_context(|| format!("Failed to create new file: {}", target_path))?;
-        
+
         file.write_all(result.to_string().as_bytes())
             .with_context(|| format!("Failed to write to file: {}", target_path))?;
     }
 
     println!("Created new decision record {} (dry-run: {}, superseded: {})",
              target_path, config.dry_run, !config.superseded.is_empty());
-    
+
     Ok(())
 }
