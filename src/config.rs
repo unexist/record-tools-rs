@@ -1,0 +1,48 @@
+///
+/// @package record-tools-rs
+///
+/// @file Config functions
+/// @copyright 2025-present Christoph Kappel <christoph@unexist.dev>
+/// @version $Id$
+///
+/// This program can be distributed under the terms of the GNU GPLv3.
+/// See the file LICENSE for details.
+///
+
+use clap_config_file::ClapConfigFile;
+
+#[derive(ClapConfigFile)]
+#[config_file_name = "config"]
+#[config_file_formats = "yaml,toml,json"]
+pub(crate) struct Config {
+    /// Record file type
+    #[config_arg(default_value = "adoc")]
+    pub(crate) file_type: String,
+
+    /// Path to templates
+    #[config_arg(default_value = "./templates")]
+    pub(crate) template_dir: String,
+
+    /// Path to Architecture Decision Records
+    #[config_arg(default_value = "./architecture-decision-record")]
+    pub(crate) adr_dir: String,
+
+    /// Path to Technical Debts Records
+    #[config_arg(default_value = "./technical-debt-records")]
+    pub(crate) tdr_dir: String,
+
+    /// Record type to create
+    #[config_arg(short = 't', accept_from = "cli_only")]
+    pub(crate) record_type: String,
+
+    /// Supersed old decision record
+    #[config_arg(short = 's', accept_from = "cli_only")]
+    pub(crate) superseded: String,
+
+    /// Just run and don't create files
+    #[config_arg(accept_from = "cli_only")]
+    pub(crate) dry_run: bool,
+
+    #[config_arg(positional)]
+    pub(crate) commands: Vec<String>,
+}
