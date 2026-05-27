@@ -1,0 +1,16 @@
+[tasks.test]
+run = "cargo test -- --nocapture"
+
+[tasks.cap]
+run = "cargo test"
+
+[tasks.trace]
+env.RUST_BACKTRACE = 1
+run = "cargo test"
+
+[tasks.run]
+raw_args = true
+run = "cargo run"
+
+[tasks.clean]
+run = "cargo clean"
