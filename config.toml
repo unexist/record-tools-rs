@@ -1,4 +1,4 @@
 file_type = "adoc"
 template_dir = "./templates"
-adr_dir = "./architecture-decision-record"
-tdr_dir = "./technical-debt-records"
+adr_dir = "./records/adrs"
+tdr_dir = "./records/tdrs"
