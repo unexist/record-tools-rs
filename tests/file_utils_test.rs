@@ -16,6 +16,7 @@ use proptest::prelude::*;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+use std::thread;
 use tempfile::TempDir;
 use anyhow::Result;
 
@@ -62,6 +63,11 @@ proptest! {
     fn should_extract_field(n in 1u16..5) {
         let temp_dir = create_n_records(n, Some("| Status: | drafted"))
             .expect("Can't create temp dir");
+        
+        println!("{:?}", temp_dir.path());
+        
+        let duration = time::Duration::from_millis(500);
+        thread::sleep(duration);
         
         let field = file_utils::extract_field(
             &temp_dir.path().join(format!(file_pattern_str!(), n)), "Status");
