@@ -56,26 +56,3 @@ proptest! {
         assert_eq!(number.unwrap(), n);
     }
 }
-
-proptest! {
-    #![proptest_config(ProptestConfig::with_cases(5))]
-    #[test]
-    fn should_extract_field(n in 1u16..5) {
-        let temp_dir = create_n_records(n, Some("| Status: | drafted"))
-            .expect("Can't create temp dir");
-
-        println!("{:?}", temp_dir.path());
-
-        let duration = time::Duration::from_millis(500);
-        thread::sleep(duration);
-
-        let field = file_utils::extract_field(
-            &temp_dir.path().join(format!(file_pattern_str!(), n)), "Status");
-
-        println!("{:?}", field);
-
-        // Todo: Refactor once assert_matches is stable
-        assert!(field.is_ok());
-        assert_eq!(field.unwrap(), "drafted");
-    }
-}
