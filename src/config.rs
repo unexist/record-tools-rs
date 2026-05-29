@@ -22,7 +22,7 @@ pub(crate) struct Config {
     pub(crate) loglevel: String,
 
     /// Print debugging messages
-    #[config_arg(short = 'D', default_value = false, accept_from = "cli_only")]
+    #[config_arg(short = 'd', default_value = false, accept_from = "cli_only")]
     pub(crate) debug: bool,
 
     /// Record file type
