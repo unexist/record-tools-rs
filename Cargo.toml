@@ -22,6 +22,7 @@ text-template = "0.1.0"
 time = {version = "0.3.41", features = ["formatting", "macros"]}
 slugify = "0.1.0"
 stdext = "0.3.3"
+derive_builder = "0.20.2"
 
 [dev-dependencies]
 assert_cmd = "2.0.17"
