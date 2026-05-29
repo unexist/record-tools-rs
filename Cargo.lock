@@ -971,7 +971,6 @@ dependencies = [
  "log",
  "predicates",
  "proptest",
- "regex",
  "serde",
  "slugify",
  "stdext",
