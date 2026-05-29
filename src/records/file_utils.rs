@@ -9,9 +9,8 @@
 /// See the file LICENSE for details.
 ///
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 use std::path::Path;
-use regex::Regex;
 
 pub fn find_next_num(path: &Path) -> Result<u16> {
     let last_entry = std::fs::read_dir(path)?
@@ -28,18 +27,4 @@ pub fn find_next_num(path: &Path) -> Result<u16> {
     }
 
     Ok(1)
-}
-
-pub fn extract_field(path: &Path, name: &str) -> Result<String> {
-    let content = std::fs::read_to_string(&path)
-        .with_context(|| format!("Failed to open template file: {}",
-                                 path.to_str().unwrap_or_default()))?;
-
-    let re = Regex::new(&*format!("{}:[ |](.*)", name))?;
-
-    if let Some((_, [result])) = re.captures(&content).map(|caps| caps.extract()) {
-        return Ok(String::from(result));
-    }
-
-    Err(anyhow!("Couldn't find field"))
 }
