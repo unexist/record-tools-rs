@@ -9,6 +9,10 @@
 /// See the file LICENSE for details.
 ///
 
+use log::{debug, LevelFilter};
+use anyhow::Result;
+use stdext::function_name;
+use crate::Config;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum LogLevel {
@@ -19,14 +23,45 @@ pub enum LogLevel {
     Debug
 }
 
+impl From<&String> for LogLevel {
+    fn from(level: &String) -> Self {
+        match level.to_lowercase().as_str() {
+            "none" => LogLevel::None,
+            "info" => LogLevel::Info,
+            "warnings" => LogLevel::Warnings,
+            "errors" => LogLevel::Error,
+            "debug" => LogLevel::Debug,
+            _ => LogLevel::Info,
+        }
+    }
+}
+
+impl From<LogLevel> for LevelFilter {
+    fn from(level: LogLevel) -> Self {
+        match level {
+            LogLevel::None => LevelFilter::Off,
+            LogLevel::Info => LevelFilter::Info,
+            LogLevel::Warnings => LevelFilter::Warn,
+            LogLevel::Error => LevelFilter::Error,
+            LogLevel::Debug => LevelFilter::Debug,
+        }
+    }
+}
+
 pub(crate) fn init(config: &Config) -> Result<()> {
     let mut level = LogLevel::from(&config.loglevel);
+
+    if config.debug {
+        level = LogLevel::Debug;
+    }
 
     let filter = LevelFilter::from(level);
 
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
         .filter_level(filter)
         .try_init()?;
+
+    debug!("{}", function_name!());
 
     Ok(())
 }
