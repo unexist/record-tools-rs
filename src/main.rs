@@ -42,12 +42,6 @@ fn sanity_checks(config: &Config) -> Result<()> {
     if !Path::new(config.template_dir.as_str()).exists() {
         bail!("Template directory {} does not exist", config.template_dir);
     }
-    if !Path::new(config.adr_dir.as_str()).exists() {
-        bail!("ADR directory {} does not exist", config.adr_dir);
-    }
-    if !Path::new(config.tdr_dir.as_str()).exists() {
-        bail!("TDR directory {} does not exist", config.tdr_dir);
-    }
 
     Ok(())
 }
