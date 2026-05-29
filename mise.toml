@@ -14,6 +14,7 @@ run = "cargo build"
 
 [tasks.crun]
 raw_args = true
+alias = "r"
 run = "cargo run"
 
 [tasks.clean]
