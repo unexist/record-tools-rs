@@ -28,17 +28,17 @@ macro_rules! file_pattern_str {
 
 fn create_n_records(n: u16, content: Option<&str>) -> Result<TempDir> {
     let temp_dir = TempDir::new()?;
-    
+
     for i in 1..n {
         let mut file = File::create(
             Path::new(&temp_dir.path().join(format!(file_pattern_str!(), i))))?;
-        
+
         if content.is_some() {
             file.write_all(content.unwrap_or_default().as_bytes())?;
             file.flush()?;
         }
     }
-    
+
     Ok(temp_dir)
 }
 
@@ -63,17 +63,17 @@ proptest! {
     fn should_extract_field(n in 1u16..5) {
         let temp_dir = create_n_records(n, Some("| Status: | drafted"))
             .expect("Can't create temp dir");
-        
+
         println!("{:?}", temp_dir.path());
-        
+
         let duration = time::Duration::from_millis(500);
         thread::sleep(duration);
-        
+
         let field = file_utils::extract_field(
             &temp_dir.path().join(format!(file_pattern_str!(), n)), "Status");
 
         println!("{:?}", field);
-        
+
         // Todo: Refactor once assert_matches is stable
         assert!(field.is_ok());
         assert_eq!(field.unwrap(), "drafted");

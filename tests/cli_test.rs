@@ -33,7 +33,7 @@ fn should_load_config_file() -> Result<(), Box<dyn std::error::Error>> {
         .arg("--template-dir=./templates")
         .arg("--adr-dir=./example/src/site/asciidoc/architecture-decision-records")
         .arg("--tdr-dir=./example/src/site/asciidoc/technical-debt-records")
-        
+
         .assert()
         .success()
         .stdout(predicate::str::contains("Loaded config from:"))
@@ -46,12 +46,12 @@ fn should_load_config_file() -> Result<(), Box<dyn std::error::Error>> {
 fn should_create_new_record_dry() -> Result<(), Box<dyn std::error::Error>> {
     Command::cargo_bin("rtrs")?
         .arg("--config-file=test_config.toml")
-        
+
         // https://github.com/bodo-run/clap-config-file/issues/8
         .arg("--template-dir=./templates")
         .arg("--adr-dir=./example/src/site/asciidoc/architecture-decision-records")
         .arg("--tdr-dir=./example/src/site/asciidoc/technical-debt-records")
-        
+
         .arg("create")
         .args(&["-t", "adr"])
         .arg("--dry-run")
@@ -69,12 +69,12 @@ fn should_create_new_record_dry() -> Result<(), Box<dyn std::error::Error>> {
 fn should_create_new_record() -> Result<(), Box<dyn std::error::Error>> {
     Command::cargo_bin("rtrs")?
         .arg("--config-file=test_config.toml")
-        
+
         // https://github.com/bodo-run/clap-config-file/issues/8
         .arg("--template-dir=./templates")
         .arg("--adr-dir=./example/src/site/asciidoc/architecture-decision-records")
         .arg("--tdr-dir=./example/src/site/asciidoc/technical-debt-records")
-        
+
         .arg("create")
         .args(&["-t", "adr"])
         .arg("Test ADR")
