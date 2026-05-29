@@ -10,7 +10,9 @@
 ///
 
 use crate::Config;
-use anyhow::{bail, Context, Result};
+use crate::records::file_utils;
+use anyhow::{Context, Result, bail};
+use slugify::slugify;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
@@ -19,8 +21,7 @@ use std::time::SystemTime;
 use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
-use slugify::slugify;
-use crate::records::file_utils;
+use log::info;
 
 pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     if title.is_empty() {
@@ -29,7 +30,8 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
 
     // Load template
     let source_path = format!("{}/{}-template.{}",
-                              config.template_dir, config.record_type, config.file_type);
+        config.template_dir, config.record_type, config.file_type
+    );
 
     let content = std::fs::read_to_string(&source_path)
         .with_context(|| format!("Failed to open template file: {}", source_path))?;
@@ -37,7 +39,7 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     let template = Template::from(content.as_str());
 
     // Get number
-    let next_num = file_utils::find_next_num(&PathBuf::from(&config.adr_dir))?;
+    let next_num = file_utils::find_next_num(&PathBuf::from(&config.get_current_path()?))?;
     let next_num_str = format!("{}", next_num);
 
     // Get time
@@ -56,8 +58,12 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     let result = template.fill_in(&values);
 
     // Write template
-    let target_path = format!("{}/{:04}-{}.{}", config.adr_dir, next_num,
-                              slugify!(&*title), config.file_type);
+    let target_path = format!("{}/{:04}-{}.{}",
+        config.get_current_path()?,
+        next_num,
+        slugify!(&*title),
+        config.file_type
+    );
 
     if config.dry_run {
         println!("Dry-run: {}:\n{}", target_path, result);
@@ -69,8 +75,11 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
             .with_context(|| format!("Failed to write to file: {}", target_path))?;
     }
 
-    println!("Created new decision record {} (dry-run: {}, superseded: {})",
-             target_path, config.dry_run, !config.superseded.is_empty());
+    info!("Created new decision record {} (dry-run: {}, superseded: {})",
+        target_path,
+        config.dry_run,
+        !config.superseded.is_empty()
+    );
 
     Ok(())
 }
