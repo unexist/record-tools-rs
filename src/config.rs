@@ -15,6 +15,14 @@ use clap_config_file::ClapConfigFile;
 #[config_file_name = "config"]
 #[config_file_formats = "yaml,toml,json"]
 pub(crate) struct Config {
+    /// Set logging level LEVEL
+    #[config_arg(short = 'l', name = "level", default_value = "", accept_from = "cli_only")]
+    pub(crate) loglevel: String,
+
+    /// Print debugging messages
+    #[config_arg(short = 'D', default_value = false, accept_from = "cli_only")]
+    pub(crate) debug: bool,
+
     /// Record file type
     #[config_arg(default_value = "adoc")]
     pub(crate) file_type: String,

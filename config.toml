@@ -1,14 +1,12 @@
 file_type = "adoc"
 template_dir = "./templates"
-adr_dir = "./architecture-decision-record"
-tdr_dir = "./technical-debt-records"
 
 [[formats]]
 name = "adr"
-directory = "./architecture-decision-record"
+directory = "./records/adr"
 field_regex = "NAME:[.]*| VALUE"
 
 [[formats]]
 name = "tdr"
-directory = "./technical-debt-records"
+directory = "./records/tdr"
 field_regex = "NAME:[.]*| VALUE"
