@@ -1,12 +1,10 @@
 file_type = "adoc"
 template_dir = "./templates"
 
-[[formats]]
+[[record_type]]
 name = "adr"
-directory = "./records/adr"
-field_regex = "NAME:[.]*| VALUE"
+directory = "./records/adrs"
 
-[[formats]]
+[[record_type]]
 name = "tdr"
-directory = "./records/tdr"
-field_regex = "NAME:[.]*| VALUE"
+directory = "./records/tdrs"

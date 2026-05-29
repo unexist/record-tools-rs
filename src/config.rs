@@ -10,13 +10,15 @@
 ///
 
 use clap_config_file::ClapConfigFile;
+use std::collections::HashMap;
+use anyhow::{Context, Result, anyhow};
 
 #[derive(ClapConfigFile)]
 #[config_file_name = "config"]
 #[config_file_formats = "yaml,toml,json"]
 pub(crate) struct Config {
     /// Set logging level LEVEL
-    #[config_arg(short = 'l', name = "level", default_value = "", accept_from = "cli_only")]
+    #[config_arg(short = 'l', name = "level", default_value = "info", accept_from = "cli_only")]
     pub(crate) loglevel: String,
 
     /// Print debugging messages
@@ -31,16 +33,12 @@ pub(crate) struct Config {
     #[config_arg(default_value = "./templates")]
     pub(crate) template_dir: String,
 
-    /// Path to Architecture Decision Records
-    #[config_arg(default_value = "./architecture-decision-record")]
-    pub(crate) adr_dir: String,
-
-    /// Path to Technical Debts Records
-    #[config_arg(default_value = "./technical-debt-records")]
-    pub(crate) tdr_dir: String,
+    /// List of known record types
+    #[config_arg(name = "record_type", accept_from = "config_only")]
+    pub(crate) record_types: Vec<HashMap<String, String>>,
 
     /// Record type to create
-    #[config_arg(short = 't', accept_from = "cli_only")]
+    #[config_arg(short = 't', default_value = "adr", accept_from = "cli_only")]
     pub(crate) record_type: String,
 
     /// Supersed old decision record
@@ -53,4 +51,16 @@ pub(crate) struct Config {
 
     #[config_arg(positional)]
     pub(crate) commands: Vec<String>,
+}
+
+impl Config {
+    pub(crate) fn get_current_path(self: &Self) -> Result<&String> {
+        for format in self.record_types.iter() {
+            if Some(&self.record_type) == format.get("name") {
+                return format.get("directory").context("No directory found");
+            }
+        }
+
+        Err(anyhow!("No format found"))
+    }
 }
