@@ -9,6 +9,7 @@
 /// See the file LICENSE for details.
 ///
 
+pub(crate) mod record;
 pub(crate) mod create;
 pub(crate) mod file_utils;
 pub(crate) mod init;
