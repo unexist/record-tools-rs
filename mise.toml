@@ -8,7 +8,11 @@ run = "cargo test"
 env.RUST_BACKTRACE = 1
 run = "cargo test"
 
-[tasks.run]
+[tasks.build]
+raw_args = true
+run = "cargo build"
+
+[tasks.crun]
 raw_args = true
 run = "cargo run"
 
