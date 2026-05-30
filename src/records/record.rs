@@ -18,10 +18,31 @@ use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
 use std::time::SystemTime;
+use derive_builder::Builder;
 use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
 use log::info;
+use stdext::default::default;
+
+#[derive(Default, Debug)]
+pub(crate) struct Record {
+    pub(crate) path: String,
+}
+
+#[derive(Builder)]
+#[builder(name = "RecordBuilder", build_fn(skip))]
+pub(crate) struct RecordBuilderSeed {
+
+}
+
+impl RecordBuilder {
+    pub(crate) fn build(&mut self) -> Result<Record> {
+        Ok(Record {
+            ..default()
+        })
+    }
+}
 
 pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     if title.is_empty() {
