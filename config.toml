@@ -4,9 +4,11 @@ template_dir = "./templates"
 [[record_type]]
 name = "adr"
 directory = "./records/adrs"
+default_template_name = "adr-template"
 statuses = [ "drafted", "proposed", "rejected", "accepted", "deprecated",  "superseded" ]
 
 [[record_type]]
 name = "tdr"
 directory = "./records/tdrs"
+default_template_name = "tdr-template"
 statuses = [ "identified", "analyzed", "approved", "in progress", "recolrd", "closed", "rejected", "superseded" ]
