@@ -10,7 +10,6 @@
 ///
 
 use crate::Config;
-use crate::records::file_utils;
 use anyhow::{Context, Result, bail};
 use slugify::slugify;
 use std::collections::HashMap;
@@ -22,6 +21,7 @@ use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
 use log::info;
+use crate::records::record;
 
 pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     if title.is_empty() {
@@ -39,7 +39,7 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
     let template = Template::from(content.as_str());
 
     // Get number
-    let next_num = file_utils::find_next_num(&PathBuf::from(&config.get_current_path()?))?;
+    let next_num = record::find_next_num(&PathBuf::from(&config.get_current_path()?))?;
     let next_num_str = format!("{}", next_num);
 
     // Get time
