@@ -11,7 +11,7 @@
 
 use clap_config_file::ClapConfigFile;
 use std::collections::HashMap;
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Result, anyhow, bail};
 
 #[derive(ClapConfigFile)]
 #[config_file_name = "config"]
@@ -55,12 +55,24 @@ pub(crate) struct Config {
 
 impl Config {
     pub(crate) fn get_current_path(self: &Self) -> Result<&String> {
-        for format in self.record_types.iter() {
-            if Some(&self.record_type) == format.get("name") {
-                return format.get("directory").context("No directory found");
+        for record_type in self.record_types.iter() {
+            if Some(&self.record_type) == record_type.get("name") {
+                return record_type.get("directory").context("No directory found");
             }
         }
 
-        Err(anyhow!("No format found"))
+        bail!("No record type found");
+    }
+
+    pub(crate) fn get_default_template_path(self: &Self) -> Result<String> {
+        for record_type in self.record_types.iter() {
+            if Some(&self.record_type) == record_type.get("name") {
+                let template_name = record_type.get("default_template_name").context("No default template found")?;
+
+                return Ok(format!("{}/{}.{}", self.template_dir, template_name, self.file_type))
+            }
+        }
+
+        bail!("No default template found");
     }
 }
