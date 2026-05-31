@@ -12,7 +12,16 @@
 
 use anyhow::Result;
 use crate::Config;
+use crate::records::record::RecordBuilder;
 
-pub(crate) fn execute(_title: String, _config: &Config) -> Result<()> {
+pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
+    let record = RecordBuilder::try_from(config)?
+        .set_number(1)
+        .set_title(title)
+        .set_date_now()
+        .build()?;
+
+    record.write("")?;
+
     Ok(())
 }
