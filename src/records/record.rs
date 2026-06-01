@@ -1,4 +1,3 @@
-use std::cell::OnceCell;
 ///
 /// @package record-tools-rs
 ///
@@ -11,9 +10,8 @@ use std::cell::OnceCell;
 ///
 
 use crate::Config;
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result};
 use slugify::slugify;
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -22,7 +20,6 @@ use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
 use log::info;
-use stdext::default::default;
 
 #[derive(Debug)]
 pub(crate) struct Record {
@@ -31,105 +28,92 @@ pub(crate) struct Record {
 }
 
 impl Record {
-    pub(crate) fn write(self: Self, _path: &str) -> Result<()> {
+    pub(crate) fn write(self: Self) -> Result<()> {
+        let mut file = File::create_new(&self.target_path)
+            .with_context(|| format!("Failed to create new file: {}", self.target_path))?;
+
+        file.write_all(self.content.to_string().as_bytes())
+            .with_context(|| format!("Failed to write to file: {}", self.target_path))?;
+
+        info!("Wrote record {}", self.target_path);
+
         Ok(())
     }
 }
 
-pub(crate) struct RecordBuilder<'a> {
-    pub(crate) template: Template<'a>,
+#[derive(Default)]
+pub(crate) struct RecordBuilder {
+    pub(crate) config: &<'_> Config,
     pub(crate) values: HashMap<String, String>,
     pub(crate) number: u16,
     pub(crate) title: String,
     pub(crate) date: String,
 }
 
-impl TryFrom<&Config> for RecordBuilder<'_> {
+impl TryFrom<&Config> for RecordBuilder {
     type Error = anyhow::Error;
 
     fn try_from(config: &Config) -> Result<Self> {
-        let content= std::fs::read_to_string(config.get_default_template_path()?)?;
-
         Ok(RecordBuilder {
-            template: Template::from(content.clone().as_str()),
-            values: Default::default(),
-            number: find_next_num(&PathBuf::from(&config.get_current_path()?))?,
-            title: Default::default(),
-            date: Default::default(),
+            config: config,
+            ..Default::default()
         })
     }
 }
 
-impl<'a> RecordBuilder<'a> {
-    pub(crate) fn set(&mut self, key: String, value: String) -> &mut RecordBuilder<'a> {
+impl RecordBuilder {
+    pub(crate) fn set(&mut self, key: String, value: String) -> &mut RecordBuilder {
         self.values.insert(key, value);
 
         self
     }
 
-    pub(crate) fn set_number(&mut self, number: u32) -> &mut RecordBuilder<'a> {
-        self.values.insert(String::from("NUMBER"), number.to_string());
+    pub(crate) fn set_number(&mut self, number: u16) -> &mut RecordBuilder {
+        self.number = number;
 
         self
     }
 
-    pub(crate) fn set_title(&mut self, title: String) -> &mut RecordBuilder<'a> {
-        self.values.insert(String::from("TITLE"), title);
+    pub(crate) fn set_title(&mut self, title: String) -> &mut RecordBuilder {
+        self.title = title;
 
         self
     }
 
-    pub(crate) fn set_date_now(&mut self) -> &mut RecordBuilder<'a> {
+    pub(crate) fn set_date_now(&mut self) -> &mut RecordBuilder {
         let odt: OffsetDateTime = SystemTime::now().into();
         let format = format_description!("[year]-[month]-[day]");
-        let date = odt.format(&format).expect("This date format should never fail");
 
-        self.values.insert(String::from("DATE"), date);
+        self.date = odt.format(&format).expect("This date format should never fail");
 
         self
     }
 
     pub(crate) fn build(&mut self) -> Result<Record> {
+        let content = std::fs::read_to_string(self.config.get_default_template_path()?)?;
+        let template = Template::from(content.as_str());
+
+        if 0 <= self.number {
+            self.number = find_next_num(&PathBuf::from(&self.config.get_current_path()?))?;
+        }
+
+        self.values.insert(String::from("NUMBER"), self.number.to_string());
+        self.values.insert(String::from("TITLE"), self.title);
+        self.values.insert(String::from("DATE"), self.date);
+
+        let mapping = self.values.iter()
+            .map(|(ref key, ref value)| (key.as_str(), value.as_str()))
+            .collect();
 
         Ok(Record {
-           content: self.template.fill_in(&self.values).to_string(),
+            content: template.fill_in(&mapping).to_string(),
             target_path:  format!("{}/{:04}-{}.{}",
-                config.get_current_path()?,
-                next_num,
-                slugify!(&*title),
-                config.file_type),
+                self.config.get_current_path()?,
+                self.number,
+                slugify!(&*self.title),
+                self.config.file_type),
         })
     }
-}
-
-pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
-    let result = template.fill_in(&values);
-
-    // Write template
-    let target_path = format!("{}/{:04}-{}.{}",
-        config.get_current_path()?,
-        next_num,
-        slugify!(&*title),
-        config.file_type
-    );
-
-    if config.dry_run {
-        println!("Dry-run: {}:\n{}", target_path, result);
-    } else {
-        let mut file = File::create_new(&target_path)
-            .with_context(|| format!("Failed to create new file: {}", target_path))?;
-
-        file.write_all(result.to_string().as_bytes())
-            .with_context(|| format!("Failed to write to file: {}", target_path))?;
-    }
-
-    info!("Created new decision record {} (dry-run: {}, superseded: {})",
-        target_path,
-        config.dry_run,
-        !config.superseded.is_empty()
-    );
-
-    Ok(())
 }
 
 pub(crate) fn find_next_num(path: &Path) -> Result<u16> {
