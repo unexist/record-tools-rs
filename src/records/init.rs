@@ -8,7 +8,7 @@
 /// This program can be distributed under the terms of the GNU GPLv3.
 /// See the file LICENSE for details.
 ///
-/// 
+///
 
 use anyhow::Result;
 use crate::Config;
@@ -21,7 +21,7 @@ pub(crate) fn execute(title: String, config: &Config) -> Result<()> {
         .set_date_now()
         .build()?;
 
-    record.write("")?;
+    record.write()?;
 
     Ok(())
 }
