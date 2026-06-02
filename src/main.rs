@@ -21,6 +21,7 @@ use std::process::exit;
 use anyhow::{bail, Result};
 use log::{error, info};
 use crate::config::Config;
+use std::collections::HashMap;
 
 /// Print version info
 fn print_version() {
@@ -62,10 +63,14 @@ fn handle_command(config: &Config) -> Result<()> {
 
         match subcmd {
             "init" => {
-                records::init::execute(remainder, &config)?;
+                let attrs = HashMap::from([(String::from("title"), remainder)]);
+
+                records::init::execute(&config, &attrs);
             },
             "create" => {
-                records::create::execute(remainder, &config)?;
+                let attrs = HashMap::from([(String::from("title"), remainder)]);
+
+                records::create::execute(&config, &attrs)?;
             },
             _ => bail!("Command not implemented yet"),
         }
