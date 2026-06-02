@@ -10,11 +10,7 @@
 ///
 
 use crate::Config;
-use anyhow::{Context, Result, bail};
-use std::fs::File;
-use std::io::Write;
-use log::info;
-use crate::records::record;
+use anyhow::{Result, bail};
 use crate::records::record::{RecordBuilder, RecordAttributes};
 
 /// Execute command
