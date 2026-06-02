@@ -22,6 +22,10 @@ use time::macros::format_description;
 use log::info;
 use std::collections::HashMap;
 
+pub(crate) const DEFAULT_TITLE: &str = "No title given";
+
+pub(crate) type RecordAttributes = HashMap<String, String>;
+
 #[derive(Debug)]
 pub(crate) struct Record {
     pub(crate) content: String,
@@ -45,7 +49,7 @@ impl Record {
 #[derive(Default)]
 pub(crate) struct RecordBuilder<'a> {
     pub(crate) config: Option<&'a Config>,
-    pub(crate) values: HashMap<String, String>,
+    pub(crate) attrs: RecordAttributes,
     pub(crate) number: i16,
     pub(crate) title: String,
     pub(crate) date: String,
@@ -66,7 +70,13 @@ impl<'a> TryFrom<&'a Config> for RecordBuilder<'a> {
 impl<'a> RecordBuilder<'a> {
     #[allow(unused)]
     pub(crate) fn set(&'a mut self, key: String, value: String) -> &'a mut RecordBuilder<'a> {
-        self.values.insert(key, value);
+        self.attrs.insert(key, value);
+
+        self
+    }
+
+    pub(crate) fn merge(&'a mut self, attrs: &RecordAttributes) -> &'a mut RecordBuilder<'a> {
+        self.attrs.extend(attrs.into_iter().map(|(key, value)| (key.clone(), value.clone())));
 
         self
     }
@@ -77,8 +87,8 @@ impl<'a> RecordBuilder<'a> {
         self
     }
 
-    pub(crate) fn set_title(&'a mut self, title: String) -> &'a mut RecordBuilder<'a> {
-        self.title = title;
+    pub(crate) fn set_title(&'a mut self, title: &str) -> &'a mut RecordBuilder<'a> {
+        self.title = title.to_string();
 
         self
     }
@@ -103,11 +113,11 @@ impl<'a> RecordBuilder<'a> {
                 &self.config.unwrap().get_current_path()?))?;
         }
 
-        self.values.insert(String::from("NUMBER"), self.number.to_string());
-        self.values.insert(String::from("TITLE"), self.title.to_string());
-        self.values.insert(String::from("DATE"), self.date.to_string());
+        self.attrs.insert(String::from("NUMBER"), self.number.to_string());
+        self.attrs.insert(String::from("TITLE"), self.title.to_string());
+        self.attrs.insert(String::from("DATE"), self.date.to_string());
 
-        let mapping = self.values.iter()
+        let mapping = self.attrs.iter()
             .map(|(ref key, ref value)| (key.as_str(), value.as_str()))
             .collect();
 
