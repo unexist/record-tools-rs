@@ -11,7 +11,7 @@
 
 use crate::Config;
 use anyhow::{Result, bail};
-use crate::records::record::{RecordBuilder, RecordAttributes};
+use crate::records::record::{RecordBuilder, RecordAttributes, DEFAULT_TITLE};
 
 /// Execute command
 ///
@@ -31,7 +31,6 @@ pub(crate) fn execute(config: &Config, attrs: &RecordAttributes) -> Result<()> {
     }
 
     let record = RecordBuilder::try_from(config)?
-        .set_number(1)
         .set_title(title)
         .set_date_now()
         .merge(attrs)
