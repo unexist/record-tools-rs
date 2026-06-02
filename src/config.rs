@@ -11,7 +11,7 @@
 
 use clap_config_file::ClapConfigFile;
 use std::collections::HashMap;
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{Context, Result, bail};
 
 #[derive(ClapConfigFile)]
 #[config_file_name = "config"]
