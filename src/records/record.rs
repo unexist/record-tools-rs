@@ -20,6 +20,7 @@ use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
 use log::info;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct Record {
@@ -42,64 +43,69 @@ impl Record {
 }
 
 #[derive(Default)]
-pub(crate) struct RecordBuilder {
-    pub(crate) config: &<'_> Config,
+pub(crate) struct RecordBuilder<'a> {
+    pub(crate) config: Option<&'a Config>,
     pub(crate) values: HashMap<String, String>,
-    pub(crate) number: u16,
+    pub(crate) number: i16,
     pub(crate) title: String,
     pub(crate) date: String,
 }
 
-impl TryFrom<&Config> for RecordBuilder {
+impl<'a> TryFrom<&'a Config> for RecordBuilder<'a> {
     type Error = anyhow::Error;
 
-    fn try_from(config: &Config) -> Result<Self> {
+    fn try_from(config: &'a Config) -> Result<Self> {
         Ok(RecordBuilder {
-            config: config,
+            config: Some(config),
+            number: 0,
             ..Default::default()
         })
     }
 }
 
-impl RecordBuilder {
-    pub(crate) fn set(&mut self, key: String, value: String) -> &mut RecordBuilder {
+impl<'a> RecordBuilder<'a> {
+    #[allow(unused)]
+    pub(crate) fn set(&'a mut self, key: String, value: String) -> &'a mut RecordBuilder<'a> {
         self.values.insert(key, value);
 
         self
     }
 
-    pub(crate) fn set_number(&mut self, number: u16) -> &mut RecordBuilder {
+    pub(crate) fn set_number(&'a mut self, number: i16) -> &'a mut RecordBuilder<'a> {
         self.number = number;
 
         self
     }
 
-    pub(crate) fn set_title(&mut self, title: String) -> &mut RecordBuilder {
+    pub(crate) fn set_title(&'a mut self, title: String) -> &'a mut RecordBuilder<'a> {
         self.title = title;
 
         self
     }
 
-    pub(crate) fn set_date_now(&mut self) -> &mut RecordBuilder {
+    pub(crate) fn set_date_now(&'a mut self) -> &'a mut RecordBuilder<'a> {
         let odt: OffsetDateTime = SystemTime::now().into();
         let format = format_description!("[year]-[month]-[day]");
 
-        self.date = odt.format(&format).expect("This date format should never fail");
+        self.date = odt.format(&format)
+            .expect("This date format should never fail");
 
         self
     }
 
     pub(crate) fn build(&mut self) -> Result<Record> {
-        let content = std::fs::read_to_string(self.config.get_default_template_path()?)?;
+        let content = std::fs::read_to_string(self.config.unwrap()
+            .get_default_template_path()?)?;
         let template = Template::from(content.as_str());
 
         if 0 <= self.number {
-            self.number = find_next_num(&PathBuf::from(&self.config.get_current_path()?))?;
+            self.number = find_next_num(&PathBuf::from(
+                &self.config.unwrap().get_current_path()?))?;
         }
 
         self.values.insert(String::from("NUMBER"), self.number.to_string());
-        self.values.insert(String::from("TITLE"), self.title);
-        self.values.insert(String::from("DATE"), self.date);
+        self.values.insert(String::from("TITLE"), self.title.to_string());
+        self.values.insert(String::from("DATE"), self.date.to_string());
 
         let mapping = self.values.iter()
             .map(|(ref key, ref value)| (key.as_str(), value.as_str()))
@@ -108,15 +114,15 @@ impl RecordBuilder {
         Ok(Record {
             content: template.fill_in(&mapping).to_string(),
             target_path:  format!("{}/{:04}-{}.{}",
-                self.config.get_current_path()?,
+                self.config.unwrap().get_current_path()?,
                 self.number,
                 slugify!(&*self.title),
-                self.config.file_type),
+                self.config.unwrap().file_type),
         })
     }
 }
 
-pub(crate) fn find_next_num(path: &Path) -> Result<u16> {
+pub(crate) fn find_next_num(path: &Path) -> Result<i16> {
     let last_entry = std::fs::read_dir(path)?
         .flatten()
         .filter(|f| f.metadata().unwrap().is_file())
@@ -127,7 +133,7 @@ pub(crate) fn find_next_num(path: &Path) -> Result<u16> {
             .with_context(|| format!("Couldn't convert {:?} to string", entry.file_name()))?
             .chars().take(4).collect::<String>();
 
-        return number.parse::<u16>().map_err(anyhow::Error::from).map(|i| i + 1);
+        return number.parse::<i16>().map_err(anyhow::Error::from).map(|i| i + 1);
     }
 
     Ok(1)
