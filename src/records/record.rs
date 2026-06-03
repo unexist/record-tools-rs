@@ -33,6 +33,12 @@ pub(crate) struct Record {
 }
 
 impl Record {
+
+    /// Write record to disk
+     ///
+     /// # Returns
+     ///
+     /// A [`Result`] with either [`Record`] on success or otherwise [`anyhow::Error`]
     pub(crate) fn write(self: Self) -> Result<()> {
         debug!("Creating record `{}`", self.target_path);
 
