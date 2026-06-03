@@ -9,6 +9,8 @@
 /// See the file LICENSE for details.
 ///
 
+/// Commands module
+mod commands;
 /// Records module
 mod records;
 /// Config module
@@ -73,12 +75,12 @@ fn handle_command(config: &Config) -> Result<()> {
             "init" => {
                 let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
 
-                records::init::execute(&config, &attrs)?;
+                commands::init::execute(&config, &attrs)?;
             },
             "create" => {
                 let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
 
-                records::create::execute(&config, &attrs)?;
+                commands::create::execute(&config, &attrs)?;
             },
             _ => bail!("Command not implemented yet"),
         }
