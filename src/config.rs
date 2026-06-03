@@ -42,6 +42,18 @@ pub(crate) struct Config {
     #[config_arg(short = 't', default_value = "adr", accept_from = "cli_only")]
     pub(crate) record_type: String,
 
+    /// Username to ue for new records
+    #[config_arg(short = 'U', env = "USER")]
+    pub(crate) username: String,
+
+    /// Record type to create
+    #[config_arg(short = 'T', default_value = "No title given", accept_from = "cli_only")]
+    pub(crate) title: String,
+
+    /// Edit record after creation
+    #[config_arg(short = 'e', accept_from = "cli_only")]
+    pub(crate) edit: bool,
+
     /// Supersed old decision record
     #[config_arg(short = 's', accept_from = "cli_only")]
     pub(crate) superseded: String,
