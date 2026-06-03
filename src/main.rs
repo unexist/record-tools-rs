@@ -16,7 +16,7 @@ mod config;
 /// Log facility
 mod logger;
 
-use std::process::exit;
+use std::{fs::create_dir_all, process::exit};
 use anyhow::{bail, Result};
 use log::{error, info, debug};
 use crate::config::Config;
@@ -47,7 +47,9 @@ fn sanity_checks(config: &Config) -> Result<()> {
     let record_path = config.get_record_path()?;
 
     if !record_path.exists() {
-        debug!("Creating records directory")
+        debug!("Creating records directory `{:?}`",record_path);
+
+        create_dir_all(record_path)?;
     }
 
     Ok(())
@@ -97,9 +99,9 @@ fn main() -> Result<()> {
 
     print_version();
 
-    info!("Loaded config from: {:?}", path.unwrap_or_default());
-    info!("Config: {:?}", config);
-    info!("Command: {:?}", config.commands);
+    info!("Reading file `{:?}`", path.unwrap_or_default());
+    debug!("Config: {:?}", config);
+    debug!("Command: {:?}", config.commands);
 
     if let Err(e) = sanity_checks(&config) {
         error!("Error: {}", e);
