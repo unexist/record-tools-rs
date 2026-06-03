@@ -19,3 +19,6 @@ run = "cargo run"
 
 [tasks.clean]
 run = "cargo clean"
+
+[tasks.clear]
+run = "rm -rf ./records/*"
