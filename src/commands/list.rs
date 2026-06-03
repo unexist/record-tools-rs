@@ -23,6 +23,6 @@ use crate::Config;
 /// # Returns
 ///
 /// A [`Result`] with either [`unit`] on success or otherwise [`anyhow::Error`]
-pub(crate) fn execute(config: &Config, attrs: &RecordAttributes) -> Result<()> {
+pub(crate) fn execute(_config: &Config) -> Result<()> {
     Ok(())
 }

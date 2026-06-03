@@ -72,18 +72,18 @@ fn handle_command(config: &Config) -> Result<()> {
         let _remainder = config.commands[1..].join(" ").to_string();
 
         match subcmd {
-            "init" => {
-                let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
-
-                commands::init::execute(&config, &attrs)?;
-            },
             "create" => {
                 let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
 
                 commands::create::execute(&config, &attrs)?;
             },
-            "create" => {
-                commands::create::list(&config, &attrs)?;
+            "init" => {
+                let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
+
+                commands::init::execute(&config, &attrs)?;
+            },
+            "list" => {
+                commands::list::execute(&config)?;
             },
             _ => bail!("Command not implemented yet"),
         }
