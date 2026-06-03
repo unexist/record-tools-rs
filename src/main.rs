@@ -65,7 +65,7 @@ fn handle_command(config: &Config) -> Result<()> {
             "init" => {
                 let attrs = HashMap::from([(String::from("title"), remainder)]);
 
-                records::init::execute(&config, &attrs);
+                records::init::execute(&config, &attrs)?;
             },
             "create" => {
                 let attrs = HashMap::from([(String::from("title"), remainder)]);
