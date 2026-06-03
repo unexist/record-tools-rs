@@ -67,16 +67,16 @@ fn sanity_checks(config: &Config) -> Result<()> {
 fn handle_command(config: &Config) -> Result<()> {
     if !config.commands.is_empty() {
         let subcmd = config.commands[0].as_str();
-        let remainder = config.commands[1..].join(" ").to_string();
+        let _remainder = config.commands[1..].join(" ").to_string();
 
         match subcmd {
             "init" => {
-                let attrs = HashMap::from([(String::from("title"), remainder)]);
+                let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
 
                 records::init::execute(&config, &attrs)?;
             },
             "create" => {
-                let attrs = HashMap::from([(String::from("title"), remainder)]);
+                let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
 
                 records::create::execute(&config, &attrs)?;
             },
