@@ -82,6 +82,9 @@ fn handle_command(config: &Config) -> Result<()> {
 
                 commands::create::execute(&config, &attrs)?;
             },
+            "create" => {
+                commands::create::list(&config, &attrs)?;
+            },
             _ => bail!("Command not implemented yet"),
         }
     }
