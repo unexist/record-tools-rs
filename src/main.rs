@@ -16,10 +16,9 @@ mod config;
 /// Log facility
 mod logger;
 
-use std::path::Path;
 use std::process::exit;
 use anyhow::{bail, Result};
-use log::{error, info};
+use log::{error, info, debug};
 use crate::config::Config;
 use std::collections::HashMap;
 
@@ -40,8 +39,15 @@ fn print_version() {
 ///
 /// A [`Result`] with either [`unit`] on success or otherwise [`anyhow::Error`]
 fn sanity_checks(config: &Config) -> Result<()> {
-    if !Path::new(config.template_dir.as_str()).exists() {
+    if !config.get_template_path().exists() {
         bail!("Template directory {} does not exist", config.template_dir);
+    }
+
+    // Check record path
+    let record_path = config.get_record_path()?;
+
+    if !record_path.exists() {
+        debug!("Creating records directory")
     }
 
     Ok(())

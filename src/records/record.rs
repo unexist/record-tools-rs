@@ -19,7 +19,7 @@ use std::time::SystemTime;
 use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
-use log::info;
+use log::{info, debug};
 use std::collections::HashMap;
 
 pub(crate) const DEFAULT_TITLE: &str = "No title given";
@@ -34,6 +34,8 @@ pub(crate) struct Record {
 
 impl Record {
     pub(crate) fn write(self: Self) -> Result<()> {
+        debug!("Creating file {}", self.target_path);
+
         let mut file = File::create_new(&self.target_path)
             .with_context(|| format!("Failed to create new file: {}", self.target_path))?;
 
@@ -110,7 +112,7 @@ impl<'a> RecordBuilder<'a> {
 
         if 0 <= self.number {
             self.number = find_next_num(&PathBuf::from(
-                &self.config.unwrap().get_current_path()?))?;
+                &self.config.unwrap().get_record_path()?))?;
         }
 
         self.attrs.insert(String::from("NUMBER"), self.number.to_string());
@@ -124,7 +126,7 @@ impl<'a> RecordBuilder<'a> {
         Ok(Record {
             content: template.fill_in(&mapping).to_string(),
             target_path:  format!("{}/{:04}-{}.{}",
-                self.config.unwrap().get_current_path()?,
+                self.config.unwrap().get_record_path()?.display(),
                 self.number,
                 slugify!(&*self.title),
                 self.config.unwrap().file_type),
