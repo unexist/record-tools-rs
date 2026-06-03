@@ -34,7 +34,7 @@ pub(crate) struct Record {
 
 impl Record {
     pub(crate) fn write(self: Self) -> Result<()> {
-        debug!("Creating file {}", self.target_path);
+        debug!("Creating record `{}`", self.target_path);
 
         let mut file = File::create_new(&self.target_path)
             .with_context(|| format!("Failed to create new file: {}", self.target_path))?;
@@ -42,7 +42,7 @@ impl Record {
         file.write_all(self.content.to_string().as_bytes())
             .with_context(|| format!("Failed to write to file: {}", self.target_path))?;
 
-        info!("Wrote record {}", self.target_path);
+        info!("Wrote record `{}`", self.target_path);
 
         Ok(())
     }
@@ -120,8 +120,10 @@ impl<'a> RecordBuilder<'a> {
         self.attrs.insert(String::from("DATE"), self.date.to_string());
 
         let mapping = self.attrs.iter()
-            .map(|(ref key, ref value)| (key.as_str(), value.as_str()))
+            .map(|(ref k, ref v)| (k.as_str(), v.as_str()))
             .collect();
+
+        debug!("Using attributes {:?}", mapping);
 
         Ok(Record {
             content: template.fill_in(&mapping).to_string(),
