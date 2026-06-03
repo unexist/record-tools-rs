@@ -1,7 +1,7 @@
 ///
 /// @package record-tools-rs
 ///
-/// @file Create new record
+/// @file Init record repository
 /// @copyright 2025-present Christoph Kappel <christoph@unexist.dev>
 /// @version $Id$
 ///
