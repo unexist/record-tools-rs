@@ -48,6 +48,15 @@ impl From<LogLevel> for LevelFilter {
     }
 }
 
+/// Init logging system
+///
+/// # Arguments
+///
+/// * `config` - Config values read either from args or config file
+///
+/// # Returns
+///
+/// A [`Result`] with either [`unit`] on success or otherwise [`anyhow::Error`]
 pub(crate) fn init(config: &Config) -> Result<()> {
     let mut level = LogLevel::from(&config.loglevel);
 

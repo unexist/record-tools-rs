@@ -70,6 +70,17 @@ impl<'a> TryFrom<&'a Config> for RecordBuilder<'a> {
 }
 
 impl<'a> RecordBuilder<'a> {
+
+    /// Set specific attribute
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - Name of the attribute
+    /// * `value` - Valueof the attribute
+    ///
+    /// # Returns
+    ///
+    /// An instance of [`RecordBuilder`]
     #[allow(unused)]
     pub(crate) fn set(&'a mut self, key: String, value: String) -> &'a mut RecordBuilder<'a> {
         self.attrs.insert(key, value);
@@ -77,24 +88,58 @@ impl<'a> RecordBuilder<'a> {
         self
     }
 
+    /// Merge attributes with the internal set
+    ///
+    /// # Arguments
+    ///
+    /// * `attrs` - Attributes to merge
+    ///
+    /// # Returns
+    ///
+    /// An instance of [`RecordBuilder`]
     pub(crate) fn merge(&'a mut self, attrs: &RecordAttributes) -> &'a mut RecordBuilder<'a> {
         self.attrs.extend(attrs.into_iter().map(|(key, value)| (key.clone(), value.clone())));
 
         self
     }
 
+    /// Set title of the current record
+    ///
+    /// # Arguments
+    ///
+    /// * `number` - Number to set for this record
+    ///
+    /// # Returns
+    ///
+    /// An instance of [`RecordBuilder`]
     pub(crate) fn set_number(&'a mut self, number: i16) -> &'a mut RecordBuilder<'a> {
         self.number = number;
 
         self
     }
 
+    /// Set title of the current record
+    ///
+    /// # Arguments
+    ///
+    /// * `title` - Title to set for this record
+    ///
+    /// # Returns
+    ///
+    /// An instance of [`RecordBuilder`]
     pub(crate) fn set_title(&'a mut self, title: &str) -> &'a mut RecordBuilder<'a> {
         self.title = title.to_string();
 
         self
     }
 
+    /// Set current date to now
+    ///
+    /// # Arguments
+    ///
+    /// # Returns
+    ///
+    /// A [`Result`] with either [`Record`] on success or otherwise [`anyhow::Error`]
     pub(crate) fn set_date_now(&'a mut self) -> &'a mut RecordBuilder<'a> {
         let odt: OffsetDateTime = SystemTime::now().into();
         let format = format_description!("[year]-[month]-[day]");
@@ -105,6 +150,13 @@ impl<'a> RecordBuilder<'a> {
         self
     }
 
+    /// Build a new Record from the provided values
+    ///
+    /// # Arguments
+    ///
+    /// # Returns
+    ///
+    /// A [`Result`] with either [`Record`] on success or otherwise [`anyhow::Error`]
     pub(crate) fn build(&mut self) -> Result<Record> {
         let content = std::fs::read_to_string(self.config.unwrap()
             .get_default_template_path()?)?;
@@ -136,7 +188,16 @@ impl<'a> RecordBuilder<'a> {
     }
 }
 
-pub(crate) fn find_next_num(path: &Path) -> Result<i16> {
+/// Find next free number
+///
+/// # Arguments
+///
+/// * `path` - Path to check for existing numbers files
+///
+/// # Returns
+///
+/// A [`Result`] with either [`i16`] on success or otherwise [`anyhow::Error`]
+fn find_next_num(path: &Path) -> Result<i16> {
     let last_entry = std::fs::read_dir(path)?
         .flatten()
         .filter(|f| f.metadata().unwrap().is_file())
