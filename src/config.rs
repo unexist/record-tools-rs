@@ -67,6 +67,12 @@ pub(crate) struct Config {
 }
 
 impl Config {
+
+    /// Get path to records according to type
+    ///
+    /// # Returns
+    ///
+    /// A [`Result`] with either [`PathBuf`] on success or otherwise [`anyhow::Error`]
     pub(crate) fn get_record_path(self: &Self) -> Result<PathBuf> {
         for record_type in self.record_types.iter() {
             if Some(&self.record_type) == record_type.get("name") {
@@ -77,10 +83,20 @@ impl Config {
         bail!("No record type found");
     }
 
+    /// Get path to templates
+    ///
+    /// # Returns
+    ///
+    /// A [`Result`] with either [`PathBuf`] on success or otherwise [`anyhow::Error`]
     pub(crate) fn get_template_path(self: &Self) -> PathBuf {
         PathBuf::from(&self.template_dir)
     }
 
+    /// Get path to default templates according to type
+    ///
+    /// # Returns
+    ///
+    /// A [`Result`] with either [`PathBuf`] on success or otherwise [`anyhow::Error`]
     pub(crate) fn get_default_template_path(self: &Self) -> Result<PathBuf> {
         for record_type in self.record_types.iter() {
             if Some(&self.record_type) == record_type.get("name") {
