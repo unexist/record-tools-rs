@@ -75,6 +75,17 @@ impl<'a> TryFrom<&'a Config> for RecordBuilder<'a> {
     }
 }
 
+impl<'a> TryFrom<&File> for RecordBuilder<'a> {
+    type Error = anyhow::Error;
+
+    fn try_from(_file: &File) -> Result<Self> {
+        Ok(RecordBuilder {
+            config: None,
+            ..Default::default()
+        })
+    }
+}
+
 impl<'a> RecordBuilder<'a> {
 
     /// Set specific attribute
