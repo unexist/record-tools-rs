@@ -163,28 +163,29 @@ impl<'a> RecordBuilder<'a> {
         let template = std::fs::read_to_string(self.config.context("Config cannot be none")?
             .get_default_template_path()?)?;
 
-        let mut patterns = vec!();
-        let mut replace_with = vec!();
+        let mut pattern_lines = HashMap::<String, usize>::new();
 
         let re = Regex::new(r"\$\{(?<name>[A-Z]*)\}").unwrap();
 
-        for cap in re.captures_iter(&template) {
-            let name = cap.name("name").unwrap().as_str();
-            let pat_templ = format!("$\\{{(?<{}>.*)\\}}", name);
-            let name_templ = format!("${{{}}}", name);
+        for (idx, line) in template.lines().enumerate() {
+            let mut patterns = vec!();
+            let mut replace_with = vec!();
 
-            patterns.push(name_templ);
-            replace_with.push(pat_templ);
+            for cap in re.captures_iter(line) {
+                let name = cap.name("name").unwrap().as_str();
+                let pat_templ = format!("$\\{{(?<{}>.*)\\}}", name);
+                let name_templ = format!("${{{}}}", name);
+
+                patterns.push(name_templ);
+                replace_with.push(pat_templ);
+            }
+
+            let ac = AhoCorasick::new(patterns)?;
+
+            pattern_lines.insert(ac.replace_all(line, &replace_with), idx);
         }
 
-        info!("{:?} - {:?}", patterns, replace_with);
-
-        let ac = AhoCorasick::new(patterns)?;
-        let result = ac.replace_all(&template, &replace_with);
-        let huge_re = Regex::new(&result).unwrap();
-        let captures = huge_re.captures(&content);
-
-        info!("{:?}", captures);
+        info!("{:?}", pattern_lines);
 
         Ok(self)
     }
