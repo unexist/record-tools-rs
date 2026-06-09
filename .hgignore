@@ -41,4 +41,4 @@ release.properties
 **/_*_autogen.adoc
 _records.db
 log.1
-records/
+./records/
