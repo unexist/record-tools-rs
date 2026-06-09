@@ -160,13 +160,13 @@ impl<'a> RecordBuilder<'a> {
 
     pub(crate) fn extract_from(&'a mut self, path: &Path) -> Result<&'a mut RecordBuilder<'a>> {
         let content = std::fs::read_to_string(path)?;
-        let mut template = std::fs::read_to_string(self.config.context("Config cannot be none")?
+        let template = std::fs::read_to_string(self.config.context("Config cannot be none")?
             .get_default_template_path()?)?;
-
-        let re = Regex::new(r"\$\{(?<name>[A-Z]*)\}").unwrap();
 
         let mut patterns = vec!();
         let mut replace_with = vec!();
+
+        let re = Regex::new(r"\$\{(?<name>[A-Z]*)\}").unwrap();
 
         for cap in re.captures_iter(&template) {
             let name = cap.name("name").unwrap().as_str();
@@ -181,14 +181,10 @@ impl<'a> RecordBuilder<'a> {
 
         let ac = AhoCorasick::new(patterns)?;
         let result = ac.replace_all(&template, &replace_with);
-
         let huge_re = Regex::new(&result).unwrap();
+        let captures = huge_re.captures(&content);
 
-        for cap in huge_re.captures_iter(&content) {
-            info!("{:?}", cap);
-        }
-
-        info!("{}", result);
+        info!("{:?}", captures);
 
         Ok(self)
     }
