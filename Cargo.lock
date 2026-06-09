@@ -962,6 +962,7 @@ dependencies = [
 name = "record-tools-rs"
 version = "0.1.0"
 dependencies = [
+ "aho-corasick",
  "anyhow",
  "assert_cmd",
  "clap",
@@ -971,6 +972,7 @@ dependencies = [
  "log",
  "predicates",
  "proptest",
+ "regex",
  "serde",
  "slugify",
  "stdext",
