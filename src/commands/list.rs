@@ -8,10 +8,11 @@
 /// This program can be distributed under the terms of the GNU GPLv3.
 /// See the file LICENSE for details.
 ///
-///
 
 use anyhow::Result;
-use crate::Config;
+use log::info;
+use std::fs;
+use crate::{Config, records::record::RecordBuilder};
 
 /// Execute command
 ///
@@ -23,6 +24,18 @@ use crate::Config;
 /// # Returns
 ///
 /// A [`Result`] with either [`unit`] on success or otherwise [`anyhow::Error`]
-pub(crate) fn execute(_config: &Config) -> Result<()> {
+pub(crate) fn execute(config: &Config) -> Result<()> {
+    if let Ok(dir) = fs::read_dir(config.get_record_path()?) {
+        for entry in dir {
+            let entry = entry?;
+
+            let record = RecordBuilder::try_from(config)?
+                .extract_from(&entry.path())
+                .build()?;
+
+            info!("{:?}", record.target_path);
+        }
+    }
+
     Ok(())
 }
