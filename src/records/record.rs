@@ -158,41 +158,39 @@ impl<'a> RecordBuilder<'a> {
         self
     }
 
-    pub(crate) fn extract_from(&'a mut self, path: &Path) -> &'a mut RecordBuilder<'a> {
-        if let Ok(content) = std::fs::read_to_string(path) {
-            if let Ok(mut template) = std::fs::read_to_string(self.config.unwrap()
-                .get_default_template_path().unwrap()) {
-                    let re = Regex::new(r"\$\{(?<name>[A-Z]*)\}").unwrap();
+    pub(crate) fn extract_from(&'a mut self, path: &Path) -> Result<&'a mut RecordBuilder<'a>> {
+        let content = std::fs::read_to_string(path)?;
+        let mut template = std::fs::read_to_string(self.config.context("Config cannot be none")?
+            .get_default_template_path()?)?;
 
-                    let mut patterns = vec!();
-                    let mut replace_with = vec!();
+        let re = Regex::new(r"\$\{(?<name>[A-Z]*)\}").unwrap();
 
-                    for cap in re.captures_iter(&template) {
-                        let name = cap.name("name").unwrap().as_str();
-                        let pat_templ = format!("$\\{{(?<{}>.*)\\}}", name);
-                        let name_templ = format!("${{{}}}", name);
+        let mut patterns = vec!();
+        let mut replace_with = vec!();
 
-                        patterns.push(name_templ);
-                        replace_with.push(pat_templ);
-                    }
+        for cap in re.captures_iter(&template) {
+            let name = cap.name("name").unwrap().as_str();
+            let pat_templ = format!("$\\{{(?<{}>.*)\\}}", name);
+            let name_templ = format!("${{{}}}", name);
 
-                    info!("{:?} - {:?}", patterns, replace_with);
-
-                    if let Ok(ac) = AhoCorasick::new(patterns) {
-                        let result = ac.replace_all(&template, &replace_with);
-
-                        let huge_re = Regex::new(&result).unwrap();
-
-                        for cap in huge_re.captures_iter(&content) {
-                            info!("{:?}", cap);
-                        }
-
-                        info!("{}", result);
-                    }
-            }
+            patterns.push(name_templ);
+            replace_with.push(pat_templ);
         }
 
-        self
+        info!("{:?} - {:?}", patterns, replace_with);
+
+        let ac = AhoCorasick::new(patterns)?;
+        let result = ac.replace_all(&template, &replace_with);
+
+        let huge_re = Regex::new(&result).unwrap();
+
+        for cap in huge_re.captures_iter(&content) {
+            info!("{:?}", cap);
+        }
+
+        info!("{}", result);
+
+        Ok(self)
     }
 
     /// Build a new Record from the provided values
@@ -250,7 +248,7 @@ fn find_next_num(path: &Path) -> Result<i16> {
 
     if let Some(entry) = last_entry {
         let number = entry.file_name().to_str()
-            .with_context(|| format!("Couldn't; convert {:?} to string", entry.file_name()))?
+            .with_context(|| format!("Couldn't convert {:?} to string", entry.file_name()))?
             .chars().take(4).collect::<String>();
 
         return number.parse::<i16>().map_err(anyhow::Error::from).map(|i| i + 1);

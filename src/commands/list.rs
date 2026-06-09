@@ -30,7 +30,7 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
             let entry = entry?;
 
             let record = RecordBuilder::try_from(config)?
-                .extract_from(&entry.path())
+                .extract_from(&entry.path())?
                 .build()?;
 
             info!("{:?}", record.target_path);
