@@ -10,6 +10,7 @@
 ///
 
 use crate::Config;
+use crate::records::record::Record;
 use aho_corasick::AhoCorasick;
 use anyhow::{Context, Result};
 use regex::Regex;
