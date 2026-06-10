@@ -12,7 +12,7 @@
 use anyhow::Result;
 use log::info;
 use prettytable::{row, table};
-use std::fs;
+use std::{fs, io};
 use crate::{Config, records::record_builder::RecordBuilder};
 
 /// Execute command
@@ -26,25 +26,29 @@ use crate::{Config, records::record_builder::RecordBuilder};
 ///
 /// A [`Result`] with either [`unit`] on success or otherwise [`anyhow::Error`]
 pub(crate) fn execute(config: &Config) -> Result<()> {
-    if let Ok(dir) = fs::read_dir(config.get_record_path()?) {
-        let mut table = table!(["Number", "Title", "Date"]);
+    // Load and sort entries
+    let mut entries = fs::read_dir(config.get_record_path()?)?
+        .map(|res| res.map(|e| e.path()))
+        .collect::<Result<Vec<_>, io::Error>>()?;
 
-        for entry in dir {
-            let entry = entry?;
-            let record_builder = RecordBuilder::try_from(config)?
-                .extract_from(&entry.path())?;
+    entries.sort();
 
-            info!("Loaded record `{}`", entry.path().display());
+    let mut table = table!(["Number", "Title", "Date"]);
 
-            table.add_row(row![
-                record_builder.get_number(),
-                record_builder.get_title(),
-                record_builder.get_date(),
-            ]);
-        }
+    for entry in entries {
+        let record_builder = RecordBuilder::try_from(config)?
+            .extract_from(&entry)?;
 
-        table.printstd();
+        info!("Loaded record `{}`", entry.display());
+
+        table.add_row(row![
+            record_builder.get_number(),
+            record_builder.get_title(),
+            record_builder.get_date(),
+        ]);
     }
+
+    table.printstd();
 
     Ok(())
 }
