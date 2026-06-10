@@ -202,16 +202,19 @@ impl<'a> RecordBuilder<'a> {
 
         // Finally run regex and collect captured attrbiutes
         for pat in pattern_lines.iter() {
-            let re = Regex::new(&pat)?;
-
             debug!("pattern={}", pat);
+
+            let re = Regex::new(&pat)?;
 
             for cap in re.captures_iter(&content) {
                 debug!("capture={:?}", cap);
 
-                for subcap in cap.iter() {
-                    if let Some(foo) = subcap {
-                        info!("{:?}", foo);
+                for cap_name in re.capture_names() {
+                    if let Some(name) = cap_name {
+                        if let Some(act_match) = cap.name(name) {
+                            debug!("{:?} => {:?}", name, act_match.as_str());
+                            self.attrs.insert(String::from(name), String::from(act_match.as_str()));
+                        }
                     }
                 }
             }
