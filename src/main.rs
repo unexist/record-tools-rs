@@ -42,14 +42,14 @@ fn print_version() {
 /// A [`Result`] with either [`unit`] on success or otherwise [`anyhow::Error`]
 fn sanity_checks(config: &Config) -> Result<()> {
     if !config.get_template_path().exists() {
-        bail!("Template directory {} does not exist", config.template_dir);
+        bail!("Template directory `{}` does not exist", config.get_template_path().display());
     }
 
     // Check record path
     let record_path = config.get_record_path()?;
 
     if !record_path.exists() {
-        debug!("Creating records directory `{:?}`",record_path);
+        debug!("Creating records directory `{}`", record_path.display());
 
         create_dir_all(record_path)?;
     }
@@ -104,7 +104,9 @@ fn main() -> Result<()> {
 
     print_version();
 
-    info!("Reading file `{:?}`", path.unwrap_or_default());
+    if let Some(conf_path) = path {
+        info!("Reading file `{}`", conf_path.display());
+    }
     debug!("Config: {:?}", config);
     debug!("Command: {:?}", config.commands);
 
