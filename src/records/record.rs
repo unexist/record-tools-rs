@@ -240,6 +240,7 @@ impl<'a> RecordBuilder<'a> {
                 &self.config.unwrap().get_record_path()?))?;
         }
 
+        // Add default attributes
         self.attrs.insert(String::from("NUMBER"), self.number.to_string());
         self.attrs.insert(String::from("TITLE"), self.title.to_string());
         self.attrs.insert(String::from("DATE"), self.date.to_string());
@@ -253,7 +254,7 @@ impl<'a> RecordBuilder<'a> {
 
         Ok(Record {
             content: template.fill_in(&mapping).to_string(),
-            target_path:  format!("{}/{:04}-{}.{}",
+            target_path: format!("{}/{:04}-{}.{}",
                 self.config.unwrap().get_record_path()?.display(),
                 self.number,
                 slugify!(&*self.title),
