@@ -10,3 +10,4 @@
 ///
 
 pub(crate) mod record;
+pub(crate) mod record_builder;

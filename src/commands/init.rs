@@ -12,7 +12,7 @@
 
 use anyhow::Result;
 use crate::Config;
-use crate::records::record::{RecordBuilder, RecordAttributes, DEFAULT_TITLE};
+use crate::records::record_builder::{RecordBuilder, RecordAttributes, DEFAULT_TITLE};
 
 /// Execute command
 ///
