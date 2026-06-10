@@ -9,7 +9,7 @@
 /// See the file LICENSE for details.
 ///
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use log::info;
 use prettytable::{row, table};
 use std::{fs, io};
@@ -42,9 +42,9 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
         info!("Loaded record `{}`", entry.display());
 
         table.add_row(row![
-            record_builder.get_number(),
-            record_builder.get_title(),
-            record_builder.get_date(),
+            record_builder.get_number().context("Number cannot be empty")?,
+            record_builder.get_title().context("Title cannot be empty")?,
+            record_builder.get_date().context("Date cannot be empty")?,
         ]);
     }
 
