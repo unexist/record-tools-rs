@@ -60,7 +60,7 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// An instance of [`RecordBuilder`]
-    pub(crate) fn set(&'a mut self, key: &str, value: &str) -> &'a mut RecordBuilder<'a> {
+    pub(crate) fn set(mut self, key: &str, value: &str) -> RecordBuilder<'a> {
         self.attrs.insert(String::from(key), String::from(value));
 
         self
@@ -75,7 +75,7 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// An instance of [`RecordBuilder`]
-    pub(crate) fn merge(&'a mut self, attrs: &RecordAttributes) -> &'a mut RecordBuilder<'a> {
+    pub(crate) fn merge(mut self, attrs: &RecordAttributes) -> RecordBuilder<'a> {
         self.attrs.extend(attrs.into_iter().map(|(key, value)| (key.clone(), value.clone())));
 
         self
@@ -94,7 +94,7 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// An instance of [`RecordBuilder`]
-    pub(crate) fn set_number(&'a mut self, number: i16) -> &'a mut RecordBuilder<'a> {
+    pub(crate) fn set_number(self, number: i16) -> RecordBuilder<'a> {
         let formatted = format!("{}", number);
 
         self.set(ATTR_NUMBER, &formatted)
@@ -113,7 +113,7 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// An instance of [`RecordBuilder`]
-    pub(crate) fn set_title(&'a mut self, title: &str) -> &'a mut RecordBuilder<'a> {
+    pub(crate) fn set_title(self, title: &str) -> RecordBuilder<'a> {
         self.set(ATTR_TITLE, title)
     }
 
@@ -128,7 +128,7 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// An instance of [`RecordBuilder`]
-    pub(crate) fn set_date_now(&'a mut self) -> &'a mut RecordBuilder<'a> {
+    pub(crate) fn set_date_now(self) -> RecordBuilder<'a> {
         let odt: OffsetDateTime = SystemTime::now().into();
         let format = format_description!("[year]-[month]-[day]");
 
@@ -145,7 +145,7 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// A [`Result`] with either [`RecordBuilder`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn extract_from(&'a mut self, path: &Path) -> Result<&'a mut RecordBuilder<'a>> {
+    pub(crate) fn extract_from(mut self, path: &Path) -> Result<RecordBuilder<'a>> {
         let content = std::fs::read_to_string(path)?;
         let template = std::fs::read_to_string(self.config.context("Config cannot be none")?
             .get_default_template_path()?)?;
