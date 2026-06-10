@@ -81,8 +81,13 @@ impl<'a> RecordBuilder<'a> {
         self
     }
 
-    pub(crate) fn get_number(&'a self) -> &'a String {
-        self.attrs.get(ATTR_NUMBER).as_ref().unwrap()
+    /// Get the number of the record builder
+    ///
+    /// # Returns
+    ///
+    /// An [`Option`] with either [`Some(String)`] on success or otherwise [`None`]
+    pub(crate) fn get_number(&'a self) -> Option<&'a String> {
+        self.attrs.get(ATTR_NUMBER)
     }
 
     /// Set title of the current record
@@ -100,8 +105,13 @@ impl<'a> RecordBuilder<'a> {
         self.set(ATTR_NUMBER, &formatted)
     }
 
-    pub(crate) fn get_title(&'a self) -> &'a String {
-        self.attrs.get(ATTR_TITLE).as_ref().unwrap()
+    /// Get the title of the record builder
+    ///
+    /// # Returns
+    ///
+    /// An [`Option`] with either [`Some(String)`] on success or otherwise [`None`]
+    pub(crate) fn get_title(&'a self) -> Option<&'a String> {
+        self.attrs.get(ATTR_TITLE)
     }
 
     /// Set title of the current record
@@ -117,8 +127,13 @@ impl<'a> RecordBuilder<'a> {
         self.set(ATTR_TITLE, title)
     }
 
-    pub(crate) fn get_date(&'a self) -> &'a String {
-        self.attrs.get(ATTR_DATE).as_ref().unwrap()
+    /// Get the date of the record builder
+    ///
+    /// # Returns
+    ///
+    /// An [`Option`] with either [`Some(String)`] on success or otherwise [`None`]
+    pub(crate) fn get_date(&'a self) -> Option<&'a String> {
+        self.attrs.get(ATTR_DATE)
     }
 
     /// Set current date to now
@@ -214,7 +229,11 @@ impl<'a> RecordBuilder<'a> {
         let template = Template::from(content.as_str());
 
         // Sanitize record number
-        let mut num = self.get_number().parse::<i16>().unwrap_or_default();
+        let mut num = 0;
+
+        if let Some(maybe_num) = self.get_number() {
+            num = maybe_num.parse::<i16>().unwrap_or(0);
+        }
 
         if 0 <= num {
             num = find_next_num(&self.config.unwrap().get_record_path()?)?;
@@ -232,7 +251,7 @@ impl<'a> RecordBuilder<'a> {
             target_path: format!("{}/{:04}-{}.{}",
                 self.config.unwrap().get_record_path()?.display(),
                 num,
-                slugify!(&*self.get_title()),
+                slugify!(&*self.get_title().context("Title cannot be empty")?),
                 self.config.unwrap().file_type),
         })
     }
