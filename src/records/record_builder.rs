@@ -239,6 +239,8 @@ impl<'a> RecordBuilder<'a> {
             num = find_next_num(&self.config.unwrap().get_record_path()?)?;
         }
 
+        self.attrs.insert(String::from(ATTR_NUMBER), num.to_string());
+
         // Convert HashMap<String, String> to HashMap<&str, &str> to satiesfy text_template::fill_in
         let mapping = self.attrs.iter()
             .map(|(ref k, ref v)| (k.as_str(), v.as_str()))
