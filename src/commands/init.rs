@@ -28,7 +28,6 @@ pub(crate) fn execute(config: &Config, attrs: &RecordAttributes) -> Result<()> {
     let title = attrs.get("title").map_or(DEFAULT_TITLE, |v| if v.is_empty() { DEFAULT_TITLE } else { v });
 
     let record = RecordBuilder::try_from(config)?
-        .set_number(1)
         .set_title(title)
         .set_date_now()
         .merge(attrs)
