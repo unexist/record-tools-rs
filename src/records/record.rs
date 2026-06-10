@@ -147,7 +147,7 @@ impl<'a> RecordBuilder<'a> {
     ///
     /// # Returns
     ///
-    /// A [`Result`] with either [`Record`] on success or otherwise [`anyhow::Error`]
+    /// An instance of [`RecordBuilder`]
     pub(crate) fn set_date_now(&'a mut self) -> &'a mut RecordBuilder<'a> {
         let odt: OffsetDateTime = SystemTime::now().into();
         let format = format_description!("[year]-[month]-[day]");
@@ -158,34 +158,64 @@ impl<'a> RecordBuilder<'a> {
         self
     }
 
+    /// Extract record attributes based on the original template
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - Path of the record to use
+    ///
+    /// # Returns
+    ///
+    /// A [`Result`] with either [`RecordBuilder`] on success or otherwise [`anyhow::Error`]
     pub(crate) fn extract_from(&'a mut self, path: &Path) -> Result<&'a mut RecordBuilder<'a>> {
         let content = std::fs::read_to_string(path)?;
         let template = std::fs::read_to_string(self.config.context("Config cannot be none")?
             .get_default_template_path()?)?;
 
-        let mut pattern_lines = HashMap::<String, usize>::new();
+        let mut pattern_lines = vec!();
+        let re = Regex::new(r"\$\{(?<name>[A-Z_-]+)\}").unwrap();
 
-        let re = Regex::new(r"\$\{(?<name>[A-Z]*)\}").unwrap();
-
-        for (idx, line) in template.lines().enumerate() {
+        // Scan each line for attributes
+        for line in template.lines() {
             let mut patterns = vec!();
             let mut replace_with = vec!();
 
+            // Collect each attribute as a regex capture
             for cap in re.captures_iter(line) {
-                let name = cap.name("name").unwrap().as_str();
-                let pat_templ = format!("$\\{{(?<{}>.*)\\}}", name);
-                let name_templ = format!("${{{}}}", name);
+                if let Some(name) = cap.name("name") {
+                    // We need to escape all the strings to avoid special regex relevant characters
+                    let name_templ = regex::escape(format!("${{{}}}", name.as_str()).as_str()).to_string();
+                    let pat_templ = format!("(?<{}>.+)", name.as_str());
 
-                patterns.push(name_templ);
-                replace_with.push(pat_templ);
+                    patterns.push(name_templ);
+                    replace_with.push(pat_templ);
+                }
             }
 
-            let ac = AhoCorasick::new(patterns)?;
+            // Replace all attributes with the capture groups
+            if !patterns.is_empty() {
+                let ac = AhoCorasick::new(patterns)?;
 
-            pattern_lines.insert(ac.replace_all(line, &replace_with), idx);
+                pattern_lines.push(ac.replace_all(&regex::escape(line), &replace_with));
+            }
         }
 
-        info!("{:?}", pattern_lines);
+        // Finally run regex and collect captured attrbiutes
+        for pat in pattern_lines.iter() {
+            let re = Regex::new(&pat)?;
+
+            debug!("pattern={}", pat);
+
+            for cap in re.captures_iter(&content) {
+                debug!("capture={:?}", cap);
+
+                for subcap in cap.iter() {
+                    if let Some(foo) = subcap {
+                        info!("{:?}", foo);
+                    }
+                }
+            }
+        }
 
         Ok(self)
     }
@@ -211,6 +241,7 @@ impl<'a> RecordBuilder<'a> {
         self.attrs.insert(String::from("TITLE"), self.title.to_string());
         self.attrs.insert(String::from("DATE"), self.date.to_string());
 
+        // Convert HashMap<String, String> to HashMap<&str, &str> to satiesfy text_template::fill_in
         let mapping = self.attrs.iter()
             .map(|(ref k, ref v)| (k.as_str(), v.as_str()))
             .collect();
