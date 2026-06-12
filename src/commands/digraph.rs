@@ -41,12 +41,20 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
         let record_builder = RecordBuilder::try_from(config)?
             .extract_from(&entry)?;
 
-        println!("        _$n [label=\"{}\"; URL=\"{}\"];",
-            entry.file_name().context("Filename cannot be empty")?.display(),
-            record_builder.get_title().context("Title cannot be empty")?);
+        let num = record_builder.get_number().context("Numer cannot be empty")?;
+
+        println!("        _{} [label=\"{}\"; URL=\"{}\"];",
+            num,
+            record_builder.get_title().context("Title cannot be empty")?,
+            entry.file_name().context("Filename cannot be empty")?.display());
+
+        if let Ok(idx) = num.parse::<i16>() && 1 < idx {
+            println!("        _{} -> _{} [style=\"dotted\", weight=1];", (idx - 1), idx);
+        }
     }
 
     println!("    }}");
+    println!("}}");
 
     Ok(())
 }
