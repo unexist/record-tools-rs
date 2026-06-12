@@ -99,6 +99,7 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// An instance of [`RecordBuilder`]
+    #[allow(dead_code)]
     pub(crate) fn set_number(self, number: i16) -> RecordBuilder<'a> {
         let formatted = format!("{}", number);
 
@@ -164,6 +165,8 @@ impl<'a> RecordBuilder<'a> {
         let content = std::fs::read_to_string(path)?;
         let template = std::fs::read_to_string(self.config.context("Config cannot be none")?
             .get_default_template_path()?)?;
+
+        debug!("Loaded record `{}`", path.display());
 
         let mut pattern_lines = vec!();
         let re = Regex::new(r"\$\{(?<name>[A-Z_-]+)\}").unwrap();

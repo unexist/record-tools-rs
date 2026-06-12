@@ -10,7 +10,6 @@
 ///
 
 use anyhow::{Context, Result};
-use log::info;
 use prettytable::{row, table};
 use std::{fs, io};
 use crate::{Config, records::record_builder::RecordBuilder};
@@ -38,8 +37,6 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
     for entry in entries {
         let record_builder = RecordBuilder::try_from(config)?
             .extract_from(&entry)?;
-
-        info!("Loaded record `{}`", entry.display());
 
         table.add_row(row![
             record_builder.get_number().context("Number cannot be empty")?,
