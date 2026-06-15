@@ -88,6 +88,9 @@ fn handle_command(config: &Config) -> Result<()> {
             "digraph" => {
                 commands::digraph::execute(&config)?;
             },
+            "atom" => {
+                commands::atom::execute(&config)?;
+            },
             _ => bail!("Command not implemented yet"),
         }
     }
