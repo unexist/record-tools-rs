@@ -33,7 +33,7 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
 
     entries.sort();
 
-    println!(r#"digraph {{);
+    println!(r#"digraph {{
     node [shape=plaintext]
     subgraph {{"#);
 
