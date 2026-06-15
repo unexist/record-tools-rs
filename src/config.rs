@@ -26,6 +26,10 @@ pub(crate) struct Config {
     #[config_arg(short = 'd', default_value = false, accept_from = "cli_only")]
     pub(crate) debug: bool,
 
+    /// Print no system messages at all
+    #[config_arg(short = 'q', default_value = false, accept_from = "cli_only")]
+    pub(crate) quiet: bool,
+
     /// Record file type
     #[config_arg(default_value = "adoc")]
     pub(crate) file_type: String,

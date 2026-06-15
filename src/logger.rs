@@ -60,8 +60,13 @@ impl From<LogLevel> for LevelFilter {
 pub(crate) fn init(config: &Config) -> Result<()> {
     let mut level = LogLevel::from(&config.loglevel);
 
+    // Handle special logging levels
     if config.debug {
         level = LogLevel::Debug;
+    }
+
+    if config.quiet {
+        level = LogLevel::None;
     }
 
     let filter = LevelFilter::from(level);
