@@ -257,7 +257,7 @@ impl<'a> RecordBuilder<'a> {
                 self.config.unwrap().get_record_path()?.display(),
                 num,
                 slugify!(&*self.get_title().context("Title cannot be empty")?),
-                self.config.unwrap().file_type),
+                self.config.unwrap().doc_type),
         })
     }
 }
