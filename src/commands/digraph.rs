@@ -43,9 +43,10 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
 
         let num = record_builder.get_number().context("Numer cannot be empty")?;
 
-        println!("        _{} [label=\"{}\"; URL=\"{}\"];",
+        println!("        _{} [label=\"{}\"; URL=\"{}/{}\"];",
             num,
             record_builder.get_title().context("Title cannot be empty")?,
+            config.get_record_path()?.display(),
             entry.file_name().context("Filename cannot be empty")?.display());
 
         if let Ok(idx) = num.parse::<i16>() && 1 < idx {
