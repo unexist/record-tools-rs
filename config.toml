@@ -1,12 +1,20 @@
-file_type = "adoc"
+doc_type = "adoc"
 template_dir = "./templates"
 
-[[record_type]]
+[[doc_types]]
+name = "adoc"
+link_format = "link:${LINK}[${TITLE}]"
+
+[[doc_types]]
+name = "md"
+link_format = "[${TITLE}](${LINK})"
+
+[[record_types]]
 name = "adr"
 directory = "./records/adrs"
-default_template_name = "adr-template"
+template_name = "adr-template"
 
-[[record_type]]
+[[record_types]]
 name = "tdr"
 directory = "./records/tdrs"
-default_template_name = "tdr-template"
+template_name = "tdr-template"
