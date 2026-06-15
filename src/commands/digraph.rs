@@ -33,9 +33,9 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
 
     entries.sort();
 
-    println!("digraph {{");
-    println!("    node [shape=plaintext]");
-    println!("    subgraph {{");
+    println!(r#"digraph {{);
+    node [shape=plaintext]
+    subgraph {{"#);
 
     for entry in entries {
         let record_builder = RecordBuilder::try_from(config)?
@@ -53,8 +53,8 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
         }
     }
 
-    println!("    }}");
-    println!("}}");
+    println!(r#"    }}
+}}"#);
 
     Ok(())
 }
