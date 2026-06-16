@@ -1,17 +1,16 @@
-use std::{fs, io};
-
-///
-/// @package record-tools-rs
-///
-/// @file List records as digraph
-/// @copyright 2025-present Christoph Kappel <christoph@unexist.dev>
-/// @version $Id$
-///
-/// This program can be distributed under the terms of the GNU GPLv3.
-/// See the file LICENSE for details.
-///
+//!
+//! @package record-tools-rs
+//!
+//! @file List records as digraph
+//! @copyright 2025-present Christoph Kappel <christoph@unexist.dev>
+//! @version $Id$
+//!
+//! This program can be distributed under the terms of the GNU GPLv3.
+//! See the file LICENSE for details.
+//!
 
 use crate::Config;
+use std::{fs, io};
 use anyhow::{Context, Result};
 use crate::records::record_builder::RecordBuilder;
 
