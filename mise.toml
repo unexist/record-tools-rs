@@ -22,3 +22,6 @@ run = "cargo clean"
 
 [tasks.clear]
 run = "rm -rf ./records/*"
+
+[tasks.clippy]
+run = "bacon clippy"
