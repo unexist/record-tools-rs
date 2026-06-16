@@ -1,13 +1,13 @@
-///
-/// @package record-tools-rs
-///
-/// @file Config functions
-/// @copyright 2025-present Christoph Kappel <christoph@unexist.dev>
-/// @version $Id$
-///
-/// This program can be distributed under the terms of the GNU GPLv3.
-/// See the file LICENSE for details.
-///
+//!
+//! @package record-tools-rs
+//!
+//! @file Config functions
+//! @copyright 2025-present Christoph Kappel <christoph@unexist.dev>
+//! @version $Id$
+//!
+//! This program can be distributed under the terms of the GNU GPLv3.
+//! See the file LICENSE for details.
+//!
 
 use clap_config_file::ClapConfigFile;
 use std::collections::HashMap;
@@ -81,7 +81,7 @@ impl Config {
     /// # Returns
     ///
     /// A [`Result`] with either [`PathBuf`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn get_record_path(self: &Self) -> Result<PathBuf> {
+    pub(crate) fn get_record_path(&self) -> Result<PathBuf> {
         for record_type in self.record_types.iter() {
             if Some(&self.record_type) == record_type.get("name") {
                 return Ok(PathBuf::from(record_type.get("directory").context("No directory found")?));
@@ -96,7 +96,7 @@ impl Config {
     /// # Returns
     ///
     /// A [`Result`] with either [`PathBuf`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn get_template_path(self: &Self) -> PathBuf {
+    pub(crate) fn get_template_path(&self) -> PathBuf {
         PathBuf::from(&self.template_dir)
     }
 
@@ -105,7 +105,7 @@ impl Config {
     /// # Returns
     ///
     /// A [`Result`] with either [`PathBuf`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn get_default_template_path(self: &Self) -> Result<PathBuf> {
+    pub(crate) fn get_default_template_path(&self) -> Result<PathBuf> {
         for record_type in self.record_types.iter() {
             if Some(&self.record_type) == record_type.get("name") {
                 let template_name = record_type.get("template_name").context("No default template found")?;
@@ -123,7 +123,7 @@ impl Config {
     ///
     /// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
     #[allow(dead_code)]
-    pub(crate) fn get_link_format(self: &Self) -> Result<String> {
+    pub(crate) fn get_link_format(&self) -> Result<String> {
         for record_type in self.record_types.iter() {
             if Some(&self.record_type) == record_type.get("name") {
                 return Ok(String::from(record_type.get("link_format").context("No link format found")?));

@@ -75,21 +75,21 @@ fn handle_command(config: &Config) -> Result<()> {
             "create" => {
                 let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
 
-                commands::create::execute(&config, &attrs)?;
+                commands::create::execute(config, &attrs)?;
             },
             "init" => {
                 let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
 
-                commands::init::execute(&config, &attrs)?;
+                commands::init::execute(config, &attrs)?;
             },
             "list" => {
-                commands::list::execute(&config)?;
+                commands::list::execute(config)?;
             },
             "digraph" => {
-                commands::digraph::execute(&config)?;
+                commands::digraph::execute(config)?;
             },
             "atom" => {
-                commands::atom::execute(&config)?;
+                commands::atom::execute(config)?;
             },
             _ => bail!("Command not implemented yet"),
         }

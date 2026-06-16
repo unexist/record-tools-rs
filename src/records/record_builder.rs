@@ -1,13 +1,13 @@
-///
-/// @package record-tools-rs
-///
-/// @file Create new record builder
-/// @copyright 2025-present Christoph Kappel <christoph@unexist.dev>
-/// @version $Id$
-///
-/// This program can be distributed under the terms of the GNU GPLv3.
-/// See the file LICENSE for details.
-///
+//!
+//! @package record-tools-rs
+//!
+//! @file Create new record builder
+//! @copyright 2025-present Christoph Kappel <christoph@unexist.dev>
+//! @version $Id$
+//!
+//! This program can be distributed under the terms of the GNU GPLv3.
+//! See the file LICENSE for details.
+//!
 
 use crate::Config;
 use crate::records::record::Record;
@@ -25,9 +25,9 @@ use std::collections::HashMap;
 
 pub(crate) const DEFAULT_TITLE: &str = "No title given";
 
-const ATTR_NUMBER: &'static str = "NUMBER";
-const ATTR_TITLE: &'static str = "TITLE";
-const ATTR_DATE: &'static str = "DATE";
+const ATTR_NUMBER: &str = "NUMBER";
+const ATTR_TITLE: &str = "TITLE";
+const ATTR_DATE: &str = "DATE";
 
 pub(crate) type RecordAttributes = HashMap<String, String>;
 
@@ -76,7 +76,7 @@ impl<'a> RecordBuilder<'a> {
     ///
     /// An instance of [`RecordBuilder`]
     pub(crate) fn merge(mut self, attrs: &RecordAttributes) -> RecordBuilder<'a> {
-        self.attrs.extend(attrs.into_iter().map(|(key, value)| (key.clone(), value.clone())));
+        self.attrs.extend(attrs.iter().map(|(key, value)| (key.clone(), value.clone())));
 
         self
     }
@@ -200,17 +200,15 @@ impl<'a> RecordBuilder<'a> {
         for pat in pattern_lines.iter() {
             debug!("pattern={}", pat);
 
-            let re = Regex::new(&pat)?;
+            let re = Regex::new(pat)?;
 
             for cap in re.captures_iter(&content) {
                 debug!("capture={:?}", cap);
 
-                for cap_name in re.capture_names() {
-                    if let Some(name) = cap_name {
-                        if let Some(act_match) = cap.name(name) {
-                            debug!("{:?} => {:?}", name, act_match.as_str());
-                            self.attrs.insert(String::from(name), String::from(act_match.as_str()));
-                        }
+                for name in re.capture_names().flatten() {
+                    if let Some(act_match) = cap.name(name) {
+                        debug!("{:?} => {:?}", name, act_match.as_str());
+                        self.attrs.insert(String::from(name), String::from(act_match.as_str()));
                     }
                 }
             }
@@ -246,7 +244,7 @@ impl<'a> RecordBuilder<'a> {
 
         // Convert HashMap<String, String> to HashMap<&str, &str> to satiesfy text_template::fill_in
         let mapping = self.attrs.iter()
-            .map(|(ref k, ref v)| (k.as_str(), v.as_str()))
+            .map(|(k, v)| (k.as_str(), v.as_str()))
             .collect();
 
         debug!("Using attributes {:?}", mapping);
@@ -256,7 +254,7 @@ impl<'a> RecordBuilder<'a> {
             target_path: format!("{}/{:04}-{}.{}",
                 self.config.unwrap().get_record_path()?.display(),
                 num,
-                slugify!(&*self.get_title().context("Title cannot be empty")?),
+                slugify!(self.get_title().context("Title cannot be empty")?),
                 self.config.unwrap().doc_type),
         })
     }
