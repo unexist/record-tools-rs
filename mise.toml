@@ -23,5 +23,8 @@ run = "cargo clean"
 [tasks.clear]
 run = "rm -rf ./records/*"
 
+[tasks.upgrade]
+run = "case upgrade -i"
+
 [tasks.clippy]
 run = "bacon clippy"
