@@ -12,17 +12,17 @@ exclude = ["/mise.toml", "/templates"]
 
 [dependencies]
 env_logger = "0.11.10"
-log = "0.4.32"
+log = "0.4.33"
 clap = { version = "4.6.1", features = ["derive"] }
 clap-config-file = "0.6.0"
 serde = { version = "1.0.228", features = ["derive"] }
-config = "0.15.23"
+config = "0.15.24"
 anyhow = "1.0.102"
 text-template = "0.1.0"
-time = {version = "0.3.47", features = ["formatting", "macros"]}
+time = {version = "0.3.51", features = ["formatting", "macros"]}
 slugify = "0.1.0"
 stdext = "0.3.3"
-regex = "1.12.3"
+regex = "1.12.4"
 aho-corasick = "1.1.4"
 prettytable = "0.10.0"
 chrono = "0.4.45"
