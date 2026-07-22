@@ -23,8 +23,17 @@ run = "cargo clean"
 [tasks.clear]
 run = "rm -rf ./records/*"
 
-[tasks.upgrade]
-run = "case upgrade -i"
+[tasks.cupgrade]
+usage = '''
+flag "-d --dry-run" {
+    help "Enable dry-running"
+}
+'''
+run = '''
+DRY_RUN="${usage_dry_run}"
+
+cargo upgrade -i $DRY_RUN
+'''
 
 [tasks.clippy]
 run = "bacon clippy"
