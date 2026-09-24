@@ -11,7 +11,6 @@
 
 use crate::Config;
 use anyhow::Result;
-use asciidocr::{parser::Parser, scanner::Scanner};
 use log::debug;
 use std::{fs, io};
 use crate::records::record_builder::RecordBuilder;
@@ -37,16 +36,12 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
     entries.sort();
 
     for entry in entries {
-        let mut record_builder = RecordBuilder::try_from(config)?
-            .extract_from(&entry)?;
+        debug!("Reading {:?}", entry);
 
-        debug!("Reading {:?}", record_builder.get_title());
-
-        let record = record_builder.build()?;
-
-        if let Ok(asg) = Parser::new(config.get_record_path()?).parse(Scanner::new(&record.content)) {
-            println!("{}", asg.all_text());
-        }
+        RecordBuilder::try_from(config)?
+            .extract_from(&entry)?
+            .build()?
+            .write_html(config.get_record_path()?)?;
     }
 
     Ok(())
