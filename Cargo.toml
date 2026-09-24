@@ -26,6 +26,7 @@ regex = "1.13.1"
 aho-corasick = "1.1.5"
 prettytable = "0.10.0"
 chrono = "0.4.45"
+asciidocr = "0.1.14"
 
 [dev-dependencies]
 assert_cmd = "2.2.2"
