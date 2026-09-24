@@ -10,6 +10,7 @@
 //!
 
 use clap_config_file::ClapConfigFile;
+use log::debug;
 use std::collections::HashMap;
 use anyhow::{Context, Result, bail};
 use std::path::PathBuf;
@@ -73,7 +74,7 @@ pub(crate) struct Config {
     pub(crate) dry_run: bool,
 
     /// Try to fetch skin from <https://github.com/darshandsoni/asciidoctor-skins>
-    #[config_arg(default_value = "asciicodctor", accept_from = "cli_only")]
+    #[config_arg(default_value = "asciidoctor", accept_from = "cli_only")]
     pub(crate) skin_name: String,
 
     #[config_arg(positional)]
@@ -145,6 +146,8 @@ impl Config {
     ///
     /// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
     pub(crate) fn get_css_skin(&self) -> Result<String> {
+        debug!("Fetching `{}/{}.css`", GITHUB_SKIN_URL, self.skin_name);
+
         reqwest::blocking::get(format!("{}/{}.css", GITHUB_SKIN_URL, self.skin_name))?
             .text()
             .map_err(anyhow::Error::from)
