@@ -35,13 +35,15 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
 
     entries.sort();
 
+    let css = config.get_css_skin()?;
+
     for entry in entries {
         debug!("Reading {:?}", entry);
 
         RecordBuilder::try_from(config)?
             .extract_from(&entry)?
             .build()?
-            .write_html(config.get_record_path()?)?;
+            .write_html(config.get_record_path()?, &css)?;
     }
 
     Ok(())

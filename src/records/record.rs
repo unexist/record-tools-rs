@@ -44,15 +44,16 @@ impl Record {
      /// # Returns
      ///
      /// A [`Result`] with either [`()`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn write_html(self, path: PathBuf) -> Result<()> {
+    pub(crate) fn write_html(self, path: PathBuf, css: &String) -> Result<()> {
         if let Ok(asg) = Parser::new(path).parse(Scanner::new(&self.content)) {
             if let Ok(html) = render_htmlbook(&asg) {
                 debug!("HTML out: {}", html);
 
                 let html_file = format!("{}.html", &self.target_path);
+                let html_content = html.to_string().replace("</head>", &format!(r#"<style type="text/css">{}</style></head>"#, css));
 
                 File::create_new(html_file)?
-                    .write_all(html.to_string().as_bytes())?;
+                    .write_all(html_content.as_bytes())?;
             }
         }
 
