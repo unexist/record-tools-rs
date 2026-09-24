@@ -14,3 +14,4 @@ pub(crate) mod create;
 pub(crate) mod list;
 pub(crate) mod digraph;
 pub(crate) mod atom;
+pub(crate) mod adoc;

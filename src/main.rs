@@ -91,6 +91,9 @@ fn handle_command(config: &Config) -> Result<()> {
             "atom" => {
                 commands::atom::execute(config)?;
             },
+            "adoc" => {
+                commands::adoc::execute(config)?;
+            },
             _ => bail!("Command not implemented yet"),
         }
     }
