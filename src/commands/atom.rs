@@ -11,6 +11,7 @@
 
 use crate::Config;
 use anyhow::{Context, Result};
+use log::debug;
 use std::{fs, io};
 use crate::records::record_builder::RecordBuilder;
 
@@ -25,6 +26,8 @@ use crate::records::record_builder::RecordBuilder;
 ///
 /// A [`Result`] with either [`unit`] on success or otherwise [`anyhow::Error`]
 pub(crate) fn execute(config: &Config) -> Result<()> {
+    debug!("Reading files from {:?}", config.get_record_path()?);
+
     // Load and sort entries
     let mut entries = fs::read_dir(config.get_record_path()?)?
         .map(|res| res.map(|e| e.path()))
