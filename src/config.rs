@@ -9,20 +9,27 @@
 //! See the file LICENSE for details.
 //!
 
+use anyhow::{Context, Result, bail};
 use clap_config_file::ClapConfigFile;
 use log::debug;
 use std::collections::HashMap;
-use anyhow::{Context, Result, bail};
+use std::env;
 use std::path::PathBuf;
 
-const GITHUB_SKIN_URL: &'static str = "https://raw.githubusercontent.com/darshandsoni/asciidoctor-skins/refs/heads/gh-pages/css";
+const GITHUB_SKIN_URL: &'static str =
+    "https://raw.githubusercontent.com/darshandsoni/asciidoctor-skins/refs/heads/gh-pages/css";
 
 #[derive(ClapConfigFile)]
 #[config_file_name = "config"]
 #[config_file_formats = "yaml,toml,json"]
 pub(crate) struct Config {
     /// Set logging level LEVEL
-    #[config_arg(short = 'l', name = "level", default_value = "info", accept_from = "cli_only")]
+    #[config_arg(
+        short = 'l',
+        name = "level",
+        default_value = "info",
+        accept_from = "cli_only"
+    )]
     pub(crate) loglevel: String,
 
     /// Print debugging messages
@@ -40,6 +47,10 @@ pub(crate) struct Config {
     /// Path to templates
     #[config_arg(default_value = "./templates")]
     pub(crate) template_dir: String,
+
+    /// Set global output directry
+    #[config_arg(short = 'o', default_value = ".")]
+    pub(crate) output_dir: String,
 
     /// List of known document types
     #[config_arg(name = "doc_types", accept_from = "config_only")]
@@ -82,7 +93,6 @@ pub(crate) struct Config {
 }
 
 impl Config {
-
     /// Get path to records according to type
     ///
     /// # Returns
@@ -91,7 +101,9 @@ impl Config {
     pub(crate) fn get_record_path(&self) -> Result<PathBuf> {
         for record_type in self.record_types.iter() {
             if Some(&self.record_type) == record_type.get("name") {
-                return Ok(PathBuf::from(record_type.get("directory").context("No directory found")?));
+                return Ok(PathBuf::from(
+                    record_type.get("directory").context("No directory found")?,
+                ));
             }
         }
 
@@ -107,6 +119,21 @@ impl Config {
         PathBuf::from(&self.template_dir)
     }
 
+    /// Get output path
+    ///
+    /// # Returns
+    ///
+    /// A [`Result`] with either [`PathBuf`] on success or otherwise [`anyhow::Error`]
+    pub(crate) fn get_output_path(&self) -> Result<PathBuf> {
+        let dir = if self.output_dir.eq(".") {
+            env::current_dir()
+        } else {
+            Ok(PathBuf::from(&self.output_dir))
+        };
+
+        dir.map_err(anyhow::Error::from)
+    }
+
     /// Get path to default templates according to type
     ///
     /// # Returns
@@ -115,9 +142,14 @@ impl Config {
     pub(crate) fn get_default_template_path(&self) -> Result<PathBuf> {
         for record_type in self.record_types.iter() {
             if Some(&self.record_type) == record_type.get("name") {
-                let template_name = record_type.get("template_name").context("No default template found")?;
+                let template_name = record_type
+                    .get("template_name")
+                    .context("No default template found")?;
 
-                return Ok(PathBuf::from(format!("{}/{}.{}", self.template_dir, template_name, self.doc_type)))
+                return Ok(PathBuf::from(format!(
+                    "{}/{}.{}",
+                    self.template_dir, template_name, self.doc_type
+                )));
             }
         }
 
@@ -133,7 +165,11 @@ impl Config {
     pub(crate) fn get_link_format(&self) -> Result<String> {
         for record_type in self.record_types.iter() {
             if Some(&self.record_type) == record_type.get("name") {
-                return Ok(String::from(record_type.get("link_format").context("No link format found")?));
+                return Ok(String::from(
+                    record_type
+                        .get("link_format")
+                        .context("No link format found")?,
+                ));
             }
         }
 
