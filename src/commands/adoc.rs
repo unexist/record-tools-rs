@@ -42,8 +42,8 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
 
         RecordBuilder::try_from(config)?
             .extract_from(&entry)?
-            .build()?
-            .write_html(config.get_output_path()?, &css)?;
+            .build_html(&css)?
+            .write_html()?;
     }
 
     Ok(())
