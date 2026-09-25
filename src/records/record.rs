@@ -10,7 +10,6 @@
 //!
 
 use anyhow::Result;
-use asciidocr::{backends::htmls::render_htmlbook, parser::Parser, scanner::Scanner};
 use log::{debug, info};
 use std::io::Write;
 use std::{fs::File, path::PathBuf};
@@ -30,7 +29,7 @@ impl Record {
     pub(crate) fn write(self) -> Result<()> {
         debug!("Creating record `{}`", self.target_path);
 
-        File::create_new(&self.target_path)?.write_all(self.content.to_string().as_bytes())?;
+        File::create_new(&self.target_path)?.write_all(self.content.as_bytes())?;
 
         info!("Wrote record `{}`", self.target_path);
 
@@ -42,20 +41,10 @@ impl Record {
     /// # Returns
     ///
     /// A [`Result`] with either [`()`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn write_html(self, path: PathBuf, css: &String) -> Result<()> {
-        if let Ok(asg) = Parser::new(path).parse(Scanner::new(&self.content)) {
-            if let Ok(html) = render_htmlbook(&asg) {
-                debug!("HTML out: {}", html);
+    pub(crate) fn write_html(self) -> Result<()> {
+        let html_file = format!("{}.html", &self.target_path);
 
-                let html_file = format!("{}.html", &self.target_path);
-                let html_content = html.to_string().replace(
-                    "</head>",
-                    &format!(r#"<style type="text/css">{}</style></head>"#, css),
-                );
-
-                File::create_new(html_file)?.write_all(html_content.as_bytes())?;
-            }
-        }
+        File::create_new(html_file)?.write_all(self.content.as_bytes())?;
 
         Ok(())
     }
