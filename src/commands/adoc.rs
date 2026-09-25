@@ -10,10 +10,10 @@
 //!
 
 use crate::Config;
+use crate::records::record_builder::RecordBuilder;
 use anyhow::Result;
 use log::debug;
 use std::{fs, io};
-use crate::records::record_builder::RecordBuilder;
 
 /// Execute command
 ///
@@ -43,7 +43,7 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
         RecordBuilder::try_from(config)?
             .extract_from(&entry)?
             .build()?
-            .write_html(config.get_record_path()?, &css)?;
+            .write_html(config.get_output_path()?, &css)?;
     }
 
     Ok(())
