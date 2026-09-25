@@ -236,7 +236,7 @@ impl<'a> RecordBuilder<'a> {
             num = maybe_num.parse::<i16>().unwrap_or(0);
         }
 
-        if 0 <= num {
+        if 0 >= num {
             num = find_next_num(&self.config.unwrap().get_record_path()?)?;
         }
 
