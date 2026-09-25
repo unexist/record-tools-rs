@@ -13,15 +13,18 @@ use crate::Config;
 use crate::records::record::Record;
 use aho_corasick::AhoCorasick;
 use anyhow::{Context, Result};
+use asciidocr::backends::htmls::render_htmlbook;
+use asciidocr::parser::Parser;
+use asciidocr::scanner::Scanner;
+use log::debug;
 use regex::Regex;
 use slugify::slugify;
-use std::path::Path;
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
-use log::debug;
-use std::collections::HashMap;
 
 pub(crate) const DEFAULT_TITLE: &str = "No title given";
 
@@ -49,7 +52,6 @@ impl<'a> TryFrom<&'a Config> for RecordBuilder<'a> {
 }
 
 impl<'a> RecordBuilder<'a> {
-
     /// Set specific attribute
     ///
     /// # Arguments
@@ -76,7 +78,11 @@ impl<'a> RecordBuilder<'a> {
     ///
     /// An instance of [`RecordBuilder`]
     pub(crate) fn merge(mut self, attrs: &RecordAttributes) -> RecordBuilder<'a> {
-        self.attrs.extend(attrs.iter().map(|(key, value)| (key.clone(), value.clone())));
+        self.attrs.extend(
+            attrs
+                .iter()
+                .map(|(key, value)| (key.clone(), value.clone())),
+        );
 
         self
     }
@@ -148,8 +154,11 @@ impl<'a> RecordBuilder<'a> {
         let odt: OffsetDateTime = SystemTime::now().into();
         let format = format_description!("[year]-[month]-[day]");
 
-        self.set(ATTR_DATE, &odt.format(&format)
-            .expect("This date format should never fail"))
+        self.set(
+            ATTR_DATE,
+            &odt.format(&format)
+                .expect("This date format should never fail"),
+        )
     }
 
     /// Extract record attributes based on the original template
@@ -163,24 +172,28 @@ impl<'a> RecordBuilder<'a> {
     /// A [`Result`] with either [`RecordBuilder`] on success or otherwise [`anyhow::Error`]
     pub(crate) fn extract_from(mut self, path: &Path) -> Result<RecordBuilder<'a>> {
         let content = std::fs::read_to_string(path)?;
-        let template = std::fs::read_to_string(self.config.context("Config cannot be none")?
-            .get_default_template_path()?)?;
+        let template = std::fs::read_to_string(
+            self.config
+                .context("Config cannot be none")?
+                .get_default_template_path()?,
+        )?;
 
         debug!("Loaded record `{}`", path.display());
 
-        let mut pattern_lines = vec!();
+        let mut pattern_lines = vec![];
         let re = Regex::new(r"\$\{(?<name>[A-Z_-]+)\}").unwrap();
 
         // Scan each line for attributes
         for line in template.lines() {
-            let mut patterns = vec!();
-            let mut replace_with = vec!();
+            let mut patterns = vec![];
+            let mut replace_with = vec![];
 
             // Collect each attribute as a regex capture
             for cap in re.captures_iter(line) {
                 if let Some(name) = cap.name("name") {
                     // We need to escape all the strings to avoid special regex relevant characters
-                    let name_templ = regex::escape(format!("${{{}}}", name.as_str()).as_str()).to_string();
+                    let name_templ =
+                        regex::escape(format!("${{{}}}", name.as_str()).as_str()).to_string();
                     let pat_templ = format!("(?<{}>.+)", name.as_str());
 
                     patterns.push(name_templ);
@@ -208,7 +221,8 @@ impl<'a> RecordBuilder<'a> {
                 for name in re.capture_names().flatten() {
                     if let Some(act_match) = cap.name(name) {
                         debug!("{:?} => {:?}", name, act_match.as_str());
-                        self.attrs.insert(String::from(name), String::from(act_match.as_str()));
+                        self.attrs
+                            .insert(String::from(name), String::from(act_match.as_str()));
                     }
                 }
             }
@@ -224,9 +238,8 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// A [`Result`] with either [`Record`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn build(&mut self) -> Result<Record> {
-        let content = std::fs::read_to_string(self.config.unwrap()
-            .get_default_template_path()?)?;
+    pub(crate) fn build_adoc(&mut self) -> Result<Record> {
+        let content = std::fs::read_to_string(self.config.unwrap().get_default_template_path()?)?;
         let template = Template::from(content.as_str());
 
         // Sanitize record number
@@ -240,10 +253,13 @@ impl<'a> RecordBuilder<'a> {
             num = find_next_num(&self.config.unwrap().get_record_path()?)?;
         }
 
-        self.attrs.insert(String::from(ATTR_NUMBER), num.to_string());
+        self.attrs
+            .insert(String::from(ATTR_NUMBER), num.to_string());
 
         // Convert HashMap<String, String> to HashMap<&str, &str> to satiesfy text_template::fill_in
-        let mapping = self.attrs.iter()
+        let mapping = self
+            .attrs
+            .iter()
             .map(|(k, v)| (k.as_str(), v.as_str()))
             .collect();
 
@@ -251,11 +267,60 @@ impl<'a> RecordBuilder<'a> {
 
         Ok(Record {
             content: template.fill_in(&mapping).to_string(),
-            target_path: format!("{}/{:04}-{}.{}",
+            target_path: format!(
+                "{}/{:04}-{}.{}",
                 self.config.unwrap().get_record_path()?.display(),
                 num,
                 slugify!(self.get_title().context("Title cannot be empty")?),
-                self.config.unwrap().doc_type),
+                self.config.unwrap().doc_type
+            ),
+        })
+    }
+
+    pub(crate) fn build_html(&mut self, css: &str) -> Result<Record> {
+        let record = self.build_adoc()?;
+        let mut html_content: String = String::new();
+
+        if let Ok(asg) =
+            Parser::new(PathBuf::from(&record.target_path)).parse(Scanner::new(&record.content))
+        {
+            if let Ok(html) = render_htmlbook(&asg) {
+                debug!("HTML out: {}", html);
+
+                html_content = html.to_string().replace(
+                    "</head>",
+                    &format!(
+                        r#"<style type="text/css">{}</style>
+</head>"#,
+                        css
+                    ),
+                );
+
+                html_content = html_content.replace(
+                    "<body>",
+                    &format!(
+                        r#"<body>
+<div id="header>
+<h1>{}</h1>
+<div id="details">{}</div>
+</div>
+<div id="content">"#,
+                        self.get_title().expect("No title given?"),
+                        self.get_date().expect("No date given?"),
+                    ),
+                );
+
+                html_content = html_content.replace(
+                    "</body>",
+                    r#"<div id="footer"></div>
+                    </body>"#,
+                );
+            }
+        }
+
+        Ok(Record {
+            content: html_content,
+            target_path: record.target_path,
         })
     }
 }
@@ -276,11 +341,18 @@ fn find_next_num(path: &Path) -> Result<i16> {
         .max_by_key(|x| x.file_name());
 
     if let Some(entry) = last_entry {
-        let number = entry.file_name().to_str()
+        let number = entry
+            .file_name()
+            .to_str()
             .with_context(|| format!("Couldn't convert {:?} to string", entry.file_name()))?
-            .chars().take(4).collect::<String>();
+            .chars()
+            .take(4)
+            .collect::<String>();
 
-        return number.parse::<i16>().map_err(anyhow::Error::from).map(|i| i + 1);
+        return number
+            .parse::<i16>()
+            .map_err(anyhow::Error::from)
+            .map(|i| i + 1);
     }
 
     Ok(1)
