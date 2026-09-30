@@ -29,7 +29,7 @@ impl Record {
     pub(crate) fn write(self) -> Result<()> {
         debug!("Creating record `{}`", self.target_path);
 
-        File::create_new(&self.target_path)?.write_all(self.content.as_bytes())?;
+        File::create(&self.target_path)?.write_all(self.content.as_bytes())?;
 
         info!("Wrote record `{}`", self.target_path);
 
@@ -44,7 +44,7 @@ impl Record {
     pub(crate) fn write_html(self) -> Result<()> {
         let html_file = format!("{}.html", &self.target_path);
 
-        File::create_new(html_file)?.write_all(self.content.as_bytes())?;
+        File::create(html_file)?.write_all(self.content.as_bytes())?;
 
         Ok(())
     }
