@@ -300,7 +300,7 @@ impl<'a> RecordBuilder<'a> {
                     "<body>",
                     &format!(
                         r#"<body>
-<div id="header>
+<div id="header">
 <h1>{}</h1>
 <div id="details">{}</div>
 </div>
