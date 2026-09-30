@@ -17,6 +17,9 @@ raw_args = true
 alias = "r"
 run = "cargo run"
 
+[tasks.adoc]
+run = "cargo run -- adoc --output-dir=./records/html"
+
 [tasks.clean]
 run = "cargo clean"
 
