@@ -269,7 +269,7 @@ impl<'a> RecordBuilder<'a> {
             content: template.fill_in(&mapping).to_string(),
             target_path: format!(
                 "{}/{:04}-{}.{}",
-                self.config.unwrap().get_record_path()?.display(),
+                self.config.unwrap().get_output_path()?.display(),
                 num,
                 slugify!(self.get_title().context("Title cannot be empty")?),
                 self.config.unwrap().doc_type
