@@ -11,8 +11,8 @@
 
 use anyhow::Result;
 use log::{debug, info};
+use std::fs::File;
 use std::io::Write;
-use std::{fs::File, path::PathBuf};
 
 #[derive(Debug)]
 pub(crate) struct Record {
