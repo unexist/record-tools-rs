@@ -52,6 +52,10 @@ pub(crate) struct Config {
     #[config_arg(short = 'o', default_value = ".")]
     pub(crate) output_dir: String,
 
+    /// Record file type
+    #[config_arg(short = 'O', name = "output_type", default_value = "adoc")]
+    pub(crate) output_type: String,
+
     /// List of known document types
     #[config_arg(name = "doc_types", accept_from = "config_only")]
     pub(crate) doc_types: Vec<HashMap<String, String>>,

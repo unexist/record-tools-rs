@@ -11,23 +11,27 @@
 
 /// Commands module
 mod commands;
-/// Records module
-mod records;
 /// Config module
 mod config;
 /// Log facility
 mod logger;
+/// Records module
+mod records;
 
-use std::{fs::create_dir_all, process::exit};
-use anyhow::{bail, Result};
-use log::{error, info, debug};
 use crate::config::Config;
+use anyhow::{Result, bail};
+use log::{debug, error, info};
 use std::collections::HashMap;
+use std::{fs::create_dir_all, process::exit};
 
 /// Print version info
 fn print_version() {
-    info!("{} {} - Copyright (c) 2025-present {}",
-        env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"), env!("CARGO_PKG_AUTHORS"));
+    info!(
+        "{} {} - Copyright (c) 2025-present {}",
+        env!("CARGO_PKG_NAME"),
+        env!("CARGO_PKG_VERSION"),
+        env!("CARGO_PKG_AUTHORS")
+    );
     info!("Released under the GNU GPLv3");
 }
 
@@ -42,7 +46,10 @@ fn print_version() {
 /// A [`Result`] with either [`unit`] on success or otherwise [`anyhow::Error`]
 fn sanity_checks(config: &Config) -> Result<()> {
     if !config.get_template_path().exists() {
-        bail!("Template directory `{}` does not exist", config.get_template_path().display());
+        bail!(
+            "Template directory `{}` does not exist",
+            config.get_template_path().display()
+        );
     }
 
     // Check record path
@@ -76,24 +83,24 @@ fn handle_command(config: &Config) -> Result<()> {
                 let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
 
                 commands::create::execute(config, &attrs)?;
-            },
+            }
             "init" => {
                 let attrs = HashMap::from([(String::from("title"), config.title.clone())]);
 
                 commands::init::execute(config, &attrs)?;
-            },
+            }
             "list" => {
                 commands::list::execute(config)?;
-            },
+            }
             "digraph" => {
                 commands::digraph::execute(config)?;
-            },
+            }
             "atom" => {
                 commands::atom::execute(config)?;
-            },
-            "adoc" => {
+            }
+            "compile" => {
                 commands::adoc::execute(config)?;
-            },
+            }
             _ => bail!("Command not implemented yet"),
         }
     }
