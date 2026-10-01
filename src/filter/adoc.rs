@@ -25,7 +25,7 @@ use std::{fs, io};
 /// # Returns
 ///
 /// A [`Result`] with either [`unit`] on success or otherwise [`anyhow::Error`]
-pub(crate) fn execute(config: &Config) -> Result<()> {
+pub(crate) fn filter(config: &Config) -> Result<()> {
     debug!("Reading files from {:?}", config.get_record_path()?);
 
     // Load and sort entries
