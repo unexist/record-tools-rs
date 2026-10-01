@@ -18,7 +18,7 @@ alias = "r"
 run = "cargo run"
 
 [tasks.adoc]
-run = "cargo run -- adoc --output-dir=./records/html"
+run = "cargo run -- compile --output-dir=./records/html --output-type=adoc"
 
 [tasks.clean]
 run = "cargo clean"
