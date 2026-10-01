@@ -9,18 +9,17 @@
 //! See the file LICENSE for details.
 //!
 
+use crate::{Config, records::record_builder::RecordBuilder};
 use anyhow::{Context, Result};
 use log::debug;
 use prettytable::{row, table};
 use std::{fs, io};
-use crate::{Config, records::record_builder::RecordBuilder};
 
 /// Execute command
 ///
 /// # Arguments
 ///
 /// * `config` - Config values read either from args or config file
-/// * `attrs` - Record attributes
 ///
 /// # Returns
 ///
@@ -38,12 +37,15 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
     let mut table = table!(["Number", "Title", "Date"]);
 
     for entry in entries {
-        let record_builder = RecordBuilder::try_from(config)?
-            .extract_from(&entry)?;
+        let record_builder = RecordBuilder::try_from(config)?.extract_from(&entry)?;
 
         table.add_row(row![
-            record_builder.get_number().context("Number cannot be empty")?,
-            record_builder.get_title().context("Title cannot be empty")?,
+            record_builder
+                .get_number()
+                .context("Number cannot be empty")?,
+            record_builder
+                .get_title()
+                .context("Title cannot be empty")?,
             record_builder.get_date().context("Date cannot be empty")?,
         ]);
     }

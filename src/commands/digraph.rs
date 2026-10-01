@@ -19,7 +19,6 @@ use crate::records::record_builder::RecordBuilder;
 /// # Arguments
 ///
 /// * `config` - Config values read either from args or config file
-/// * `attrs` - Record attributes
 ///
 /// # Returns
 ///
