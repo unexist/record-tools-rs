@@ -270,7 +270,7 @@ impl<'a> RecordBuilder<'a> {
         self.attrs
             .insert(String::from(ATTR_NUMBER), num.to_string());
 
-        // Convert HashMap<String, String> to HashMap<&str, &str> to satiesfy text_template::fill_in
+        // Convert HashMap<String, String> to HashMap<&str, &str> to satisfy text_template::fill_in
         let mapping = self
             .attrs
             .iter()
