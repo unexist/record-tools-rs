@@ -38,7 +38,7 @@ pub(crate) fn execute(config: &Config, attrs: &RecordAttributes) -> Result<()> {
         .set_title(title)
         .set_date_now()
         .merge(attrs)
-        .build_adoc()?;
+        .build()?;
 
     if config.dry_run {
         println!("Dry-run: {}:\n{}", record.target_path, record.content);
