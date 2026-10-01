@@ -53,7 +53,7 @@ pub(crate) struct Config {
     pub(crate) output_dir: String,
 
     /// Record file type
-    #[config_arg(short = 'O', name = "output_type", default_value = "adoc")]
+    #[config_arg(short = 'O', name = "output-type", default_value = "adoc")]
     pub(crate) output_type: String,
 
     /// List of known document types
