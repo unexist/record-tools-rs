@@ -13,14 +13,11 @@ use crate::Config;
 use crate::records::record::Record;
 use aho_corasick::AhoCorasick;
 use anyhow::{Context, Result};
-use asciidocr::backends::htmls::render_htmlbook;
-use asciidocr::parser::Parser;
-use asciidocr::scanner::Scanner;
 use log::debug;
 use regex::Regex;
 use slugify::slugify;
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::time::SystemTime;
 use text_template::Template;
 use time::OffsetDateTime;
@@ -38,6 +35,7 @@ pub(crate) type RecordAttributes = HashMap<String, String>;
 pub(crate) struct RecordBuilder<'a> {
     pub(crate) config: Option<&'a Config>,
     pub(crate) attrs: RecordAttributes,
+    pub(crate) filters: Vec<&'a dyn Fn(&String) -> Result<String>>,
 }
 
 impl<'a> TryFrom<&'a Config> for RecordBuilder<'a> {
@@ -231,6 +229,15 @@ impl<'a> RecordBuilder<'a> {
         Ok(self)
     }
 
+    pub(crate) fn filter(
+        &mut self,
+        filter_func: &'a dyn Fn(&String) -> Result<String>,
+    ) -> Result<&mut Self> {
+        self.filters.push(filter_func);
+
+        Ok(self)
+    }
+
     /// Build a new Record from the provided values
     ///
     /// # Arguments
@@ -238,8 +245,15 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// A [`Result`] with either [`Record`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn build_adoc(&mut self) -> Result<Record> {
-        let content = std::fs::read_to_string(self.config.unwrap().get_default_template_path()?)?;
+    pub(crate) fn build(&mut self) -> Result<Record> {
+        let mut content =
+            std::fs::read_to_string(self.config.unwrap().get_default_template_path()?)?;
+
+        // Run filters
+        for filter in &self.filters {
+            content = filter(&content)?;
+        }
+
         let template = Template::from(content.as_str());
 
         // Sanitize record number
@@ -274,53 +288,6 @@ impl<'a> RecordBuilder<'a> {
                 slugify!(self.get_title().context("Title cannot be empty")?),
                 self.config.unwrap().doc_type
             ),
-        })
-    }
-
-    pub(crate) fn build_html(&mut self, css: &str) -> Result<Record> {
-        let record = self.build_adoc()?;
-        let mut html_content: String = String::new();
-
-        if let Ok(asg) =
-            Parser::new(PathBuf::from(&record.target_path)).parse(Scanner::new(&record.content))
-        {
-            if let Ok(html) = render_htmlbook(&asg) {
-                debug!("HTML out: {}", html);
-
-                html_content = html.to_string().replace(
-                    "</head>",
-                    &format!(
-                        r#"<style type="text/css">{}</style>
-</head>"#,
-                        css
-                    ),
-                );
-
-                html_content = html_content.replace(
-                    "<body>",
-                    &format!(
-                        r#"<body>
-<div id="header">
-<h1>{}</h1>
-<div id="details">{}</div>
-</div>
-<div id="content">"#,
-                        self.get_title().expect("No title given?"),
-                        self.get_date().expect("No date given?"),
-                    ),
-                );
-
-                html_content = html_content.replace(
-                    "</body>",
-                    r#"<div id="footer"></div>
-                    </body>"#,
-                );
-            }
-        }
-
-        Ok(Record {
-            content: html_content,
-            target_path: record.target_path,
         })
     }
 }
