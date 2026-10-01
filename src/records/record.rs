@@ -26,25 +26,12 @@ impl Record {
     /// # Returns
     ///
     /// A [`Result`] with either [`Record`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn write(self) -> Result<()> {
-        debug!("Creating record `{}`", self.target_path);
+    pub(crate) fn write(&self) -> Result<()> {
+        debug!("Writing record `{}`", self.target_path);
 
         File::create(&self.target_path)?.write_all(self.content.as_bytes())?;
 
         info!("Wrote record `{}`", self.target_path);
-
-        Ok(())
-    }
-
-    /// Write record as html to disk
-    ///
-    /// # Returns
-    ///
-    /// A [`Result`] with either [`()`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn write_html(self) -> Result<()> {
-        let html_file = format!("{}.html", &self.target_path);
-
-        File::create(html_file)?.write_all(self.content.as_bytes())?;
 
         Ok(())
     }
