@@ -9,14 +9,16 @@
 //! See the file LICENSE for details.
 //!
 
-/// Commands module
-mod commands;
-/// Config module
 mod config;
 /// Log facility
 mod logger;
 /// Records module
 mod records;
+/// Commands module
+mod commands;
+/// Filters module
+mod filters;
+/// Config module
 
 use crate::config::Config;
 use anyhow::{Result, bail};
@@ -99,7 +101,7 @@ fn handle_command(config: &Config) -> Result<()> {
                 commands::atom::execute(config)?;
             }
             "compile" => {
-                commands::adoc::execute(config)?;
+                commands::compile::execute(config)?;
             }
             _ => bail!("Command not implemented yet"),
         }
