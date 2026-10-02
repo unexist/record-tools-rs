@@ -60,7 +60,7 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// An instance of [`RecordBuilder`]
-    pub(crate) fn set(mut self, key: &str, value: &str) -> RecordBuilder<'a> {
+    pub(crate) fn set_attr(mut self, key: &str, value: &str) -> RecordBuilder<'a> {
         self.attrs.insert(String::from(key), String::from(value));
 
         self
@@ -107,7 +107,7 @@ impl<'a> RecordBuilder<'a> {
     pub(crate) fn set_number(self, number: i16) -> RecordBuilder<'a> {
         let formatted = format!("{}", number);
 
-        self.set(ATTR_NUMBER, &formatted)
+        self.set_attr(ATTR_NUMBER, &formatted)
     }
 
     /// Get the title of the record builder
@@ -129,7 +129,7 @@ impl<'a> RecordBuilder<'a> {
     ///
     /// An instance of [`RecordBuilder`]
     pub(crate) fn set_title(self, title: &str) -> RecordBuilder<'a> {
-        self.set(ATTR_TITLE, title)
+        self.set_attr(ATTR_TITLE, title)
     }
 
     /// Get the date of the record builder
@@ -152,7 +152,7 @@ impl<'a> RecordBuilder<'a> {
         let odt: OffsetDateTime = SystemTime::now().into();
         let format = format_description!("[year]-[month]-[day]");
 
-        self.set(
+        self.set_attr(
             ATTR_DATE,
             &odt.format(&format)
                 .expect("This date format should never fail"),
