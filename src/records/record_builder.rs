@@ -28,6 +28,7 @@ pub(crate) const DEFAULT_TITLE: &str = "No title given";
 const ATTR_NUMBER: &str = "NUMBER";
 const ATTR_TITLE: &str = "TITLE";
 const ATTR_DATE: &str = "DATE";
+const ATTR_FILE_EXT: &str = "FILE_EXT";
 
 pub(crate) type RecordAttributes = HashMap<String, String>;
 
@@ -143,8 +144,6 @@ impl<'a> RecordBuilder<'a> {
 
     /// Set current date to now
     ///
-    /// # Arguments
-    ///
     /// # Returns
     ///
     /// An instance of [`RecordBuilder`]
@@ -157,6 +156,19 @@ impl<'a> RecordBuilder<'a> {
             &odt.format(&format)
                 .expect("This date format should never fail"),
         )
+    }
+
+    /// Set the file ext of the rendered file
+    ///
+    /// # Arguments
+    ///
+    /// * `file_ext` - Title to set for this record
+
+    /// # Returns
+    ///
+    /// An instance of [`RecordBuilder`]
+    pub(crate) fn set_file_ext(self, file_ext: &str) -> RecordBuilder<'a> {
+        self.set_attr(ATTR_FILE_EXT, file_ext)
     }
 
     /// Extract record attributes based on the original template
@@ -286,7 +298,9 @@ impl<'a> RecordBuilder<'a> {
                 self.config.unwrap().get_output_path()?.display(),
                 num,
                 slugify!(self.get_title().context("Title cannot be empty")?),
-                self.config.unwrap().doc_type
+                self.attrs
+                    .get(ATTR_FILE_EXT)
+                    .ok_or(self.config.unwrap().doc_type)?
             ),
         })
     }
