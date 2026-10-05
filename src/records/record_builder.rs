@@ -298,9 +298,10 @@ impl<'a> RecordBuilder<'a> {
                 self.config.unwrap().get_output_path()?.display(),
                 num,
                 slugify!(self.get_title().context("Title cannot be empty")?),
-                self.attrs
-                    .get(ATTR_FILE_EXT)
-                    .ok_or(self.config.unwrap().doc_type)?
+                match self.attrs.get(ATTR_FILE_EXT) {
+                    Some(ext) => ext,
+                    None => &self.config.unwrap().doc_type,
+                }
             ),
         })
     }
