@@ -11,7 +11,7 @@
 
 use anyhow::Result;
 use asciidocr::{backends::htmls::render_htmlbook, parser::Parser, scanner::Scanner};
-use log::debug;
+use log::info;
 use std::env;
 
 /// Execute command
@@ -28,11 +28,11 @@ pub(crate) fn filter(content: &String) -> Result<String> {
 
     if let Ok(asg) = Parser::new(env::current_dir()?).parse(Scanner::new(content)) {
         if let Ok(html) = render_htmlbook(&asg) {
-            debug!("HTML out: {}", html);
+            info!("HTML out: {}", html);
 
             html_content = html.to_string().replace(
                 "</head>",
-                r#"<style type="text/css">${CSS}</style>
+                r#"<style type="text/css">%CSS%</style>
 </head>"#,
             );
 
@@ -40,8 +40,8 @@ pub(crate) fn filter(content: &String) -> Result<String> {
                 "<body>",
                 r#"<body>
 <div id="header">
-<h1>${TITLE}</h1>
-<div id="details">${DATE}</div>
+<h1>%TITLE%</h1>
+<div id="details">%DATE%</div>
 </div>
 <div id="content">"#,
             );
