@@ -2070,7 +2070,6 @@ dependencies = [
  "slugify",
  "stdext",
  "tempfile",
- "text-template",
  "time",
 ]
 
@@ -2681,12 +2680,6 @@ name = "termtree"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f50febec83f5ee1df3015341d8bd429f2d1cc62bcba7ea2076759d315084683"
-
-[[package]]
-name = "text-template"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51bcc3e9514cba67c087126b18600010c7c29b0cb51a6f6bc75e5058c2369bba"
 
 [[package]]
 name = "thiserror"
