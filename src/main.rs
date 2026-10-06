@@ -9,17 +9,16 @@
 //! See the file LICENSE for details.
 //!
 
+/// Commands module
+mod commands;
 mod config;
+/// Filters module
+mod filters;
 /// Log facility
 mod logger;
 /// Records module
 mod records;
-/// Commands module
-mod commands;
-/// Filters module
-mod filters;
 /// Config module
-
 use crate::config::Config;
 use anyhow::{Result, bail};
 use log::{debug, error, info};
@@ -123,7 +122,7 @@ fn main() -> Result<()> {
     print_version();
 
     if let Some(conf_path) = path {
-        info!("Reading file `{}`", conf_path.display());
+        info!("Reading config file `{}`", conf_path.display());
     }
     debug!("Config: {:?}", config);
     debug!("Command: {:?}", config.commands);
