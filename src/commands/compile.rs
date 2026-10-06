@@ -12,7 +12,7 @@
 use crate::records::record_builder::RecordBuilder;
 use crate::{Config, filters};
 use anyhow::Result;
-use log::debug;
+use log::{debug, info};
 use std::{fs, io};
 
 /// Execute command
@@ -38,7 +38,7 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
     let css = config.get_css_skin()?;
 
     for entry in entries {
-        debug!("Reading {:?}", entry);
+        info!("Reading file {:?}", entry);
 
         RecordBuilder::try_from(config)?
             .extract_from(&entry)?
