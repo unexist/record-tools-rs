@@ -1,12 +1,12 @@
-# ${NUMBER}. ${TITLE}
+# %NUMBER%. %TITLE%
 
 | Meta           | Value           |
 |----------------|-----------------|
-| Proposed Date: | ${DATE}         |
+| Proposed Date: | %DATE%          |
 | Decision Date: | ?               |
 | Proposer:      | NAMES           |
 | Deciders:      | NAMES           |
-| Status:        | ${STATUS}       |
+| Status:        | %STATUS%        |
 | Issues:        | ?               |
 | References:    |                 |
 | Severity:      | low             |

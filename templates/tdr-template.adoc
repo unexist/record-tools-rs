@@ -1,11 +1,11 @@
-= ${NUMBER}. ${TITLE}
+= %NUMBER%. %TITLE%
 
 |===
-| Proposed Date: | ${DATE}
+| Proposed Date: | %DATE%
 | Decision Date: | ?
 | Proposer:      | NAMES
 | Deciders:      | ?
-| Status:        | ${STATUS}
+| Status:        | %STATUS%
 | Issues:        | ?
 | References:    |
 | Severity:      | low
