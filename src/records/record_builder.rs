@@ -19,7 +19,6 @@ use slugify::slugify;
 use std::collections::HashMap;
 use std::path::Path;
 use std::time::SystemTime;
-use text_template::Template;
 use time::OffsetDateTime;
 use time::macros::format_description;
 
@@ -191,7 +190,7 @@ impl<'a> RecordBuilder<'a> {
         debug!("Loaded record `{}`", path.display());
 
         let mut pattern_lines = vec![];
-        let re = Regex::new(r"\$\{(?<name>[A-Z_-]+)\}").unwrap();
+        let re = Regex::new(r"%(?<name>[A-Z_-]+)%").unwrap();
 
         // Scan each line for attributes
         for line in template.lines() {
@@ -203,7 +202,7 @@ impl<'a> RecordBuilder<'a> {
                 if let Some(name) = cap.name("name") {
                     // We need to escape all the strings to avoid special regex relevant characters
                     let name_templ =
-                        regex::escape(format!("${{{}}}", name.as_str()).as_str()).to_string();
+                        regex::escape(format!("%{}%", name.as_str()).as_str()).to_string();
                     let pat_templ = format!("(?<{}>.+)", name.as_str());
 
                     patterns.push(name_templ);
@@ -238,6 +237,8 @@ impl<'a> RecordBuilder<'a> {
             }
         }
 
+        debug!("attrs={:?}", self.attrs);
+
         Ok(self)
     }
 
@@ -261,12 +262,10 @@ impl<'a> RecordBuilder<'a> {
         let mut content =
             std::fs::read_to_string(self.config.unwrap().get_default_template_path()?)?;
 
-        // Run filters
+        // Apply filters
         for filter in &self.filters {
             content = filter(&content)?;
         }
-
-        let template = Template::from(content.as_str());
 
         // Sanitize record number
         let mut num = 0;
@@ -282,17 +281,10 @@ impl<'a> RecordBuilder<'a> {
         self.attrs
             .insert(String::from(ATTR_NUMBER), num.to_string());
 
-        // Convert HashMap<String, String> to HashMap<&str, &str> to satisfy text_template::fill_in
-        let mapping = self
-            .attrs
-            .iter()
-            .map(|(k, v)| (k.as_str(), v.as_str()))
-            .collect();
-
-        debug!("Using attributes {:?}", mapping);
+        debug!("Using attributes {:?}", self.attrs);
 
         Ok(Record {
-            content: template.fill_in(&mapping).to_string(),
+            content: replace_all(&content, &self.attrs)?,
             target_path: format!(
                 "{}/{:04}-{}.{}",
                 self.config.unwrap().get_output_path()?.display(),
@@ -338,4 +330,35 @@ fn find_next_num(path: &Path) -> Result<i16> {
     }
 
     Ok(1)
+}
+
+/// Replace all attributes found in document
+///
+/// # Arguments
+///
+/// * `source` - Source content
+/// * `attrs` - Map of attributes to search and replace
+///
+/// # Returns
+///
+/// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
+fn replace_all(source: &str, attrs: &HashMap<String, String>) -> Result<String> {
+    let mut result = vec![];
+
+    // Split into two vecs
+    let mut patterns: Vec<String> = vec![];
+    let mut replace_with: Vec<&str> = vec![];
+
+    for attr in attrs.iter() {
+        patterns.push(format!("%{}%", attr.0));
+        replace_with.push(attr.1);
+    }
+
+    debug!("patterns={:?}, replace_width={:?}", patterns, replace_with);
+
+    let ac = AhoCorasick::new(patterns)?;
+
+    ac.try_stream_replace_all(source.as_bytes(), &mut result, &replace_with)?;
+
+    Ok(String::from_utf8(result)?)
 }
