@@ -26,7 +26,7 @@ use std::{fs, io};
 ///
 /// A [`Result`] with either [`unit`] on success or otherwise [`anyhow::Error`]
 pub(crate) fn execute(config: &Config) -> Result<()> {
-    debug!("Reading files from {:?}", config.get_record_path()?);
+    debug!("Reading record files from {:?}", config.get_record_path()?);
 
     // Load and sort entries
     let mut entries = fs::read_dir(config.get_record_path()?)?
@@ -38,13 +38,12 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
     let css = config.get_css_skin()?;
 
     for entry in entries {
-        info!("Reading file {:?}", entry);
+        info!("Reading record file {:?}", entry);
 
         RecordBuilder::try_from(config)?
             .extract_from(&entry)?
-            .set_attr("CSS", &css)
             .set_file_ext("html")
-            .filter(&filters::adoc::filter)?
+            .add_filter(&|content| filters::adoc::filter(content, &css))?
             .build()?
             .write()?;
     }

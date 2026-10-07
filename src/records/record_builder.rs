@@ -242,9 +242,18 @@ impl<'a> RecordBuilder<'a> {
         Ok(self)
     }
 
-    pub(crate) fn filter(
+    /// Add a filter to the filter chain
+    ///
+    /// # Arguments
+    ///
+    /// * `filter_func` - Filter func to call
+    ///
+    /// # Returns
+    ///
+    /// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
+    pub(crate) fn add_filter(
         &mut self,
-        filter_func: &'a dyn Fn(&String) -> Result<String>,
+        filter_func: &'a impl Fn(&String) -> Result<String>,
     ) -> Result<&mut Self> {
         self.filters.push(filter_func);
 

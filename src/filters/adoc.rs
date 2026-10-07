@@ -11,7 +11,7 @@
 
 use anyhow::Result;
 use asciidocr::{backends::htmls::render_htmlbook, parser::Parser, scanner::Scanner};
-use log::info;
+use log::{debug, info};
 use std::env;
 
 /// Execute command
@@ -23,17 +23,22 @@ use std::env;
 /// # Returns
 ///
 /// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
-pub(crate) fn filter(content: &String) -> Result<String> {
+pub(crate) fn filter(content: &String, css: &str) -> Result<String> {
     let mut html_content: String = String::new();
+
+    info!("Converting adoc to html");
 
     if let Ok(asg) = Parser::new(env::current_dir()?).parse(Scanner::new(content)) {
         if let Ok(html) = render_htmlbook(&asg) {
-            info!("HTML out: {}", html);
+            debug!("HTML out: {}", html);
 
             html_content = html.to_string().replace(
                 "</head>",
-                r#"<style type="text/css">%CSS%</style>
+                &format!(
+                    r#"<style type="text/css">{}</style>
 </head>"#,
+                    css,
+                ),
             );
 
             html_content = html_content.replace(
