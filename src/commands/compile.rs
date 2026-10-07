@@ -42,8 +42,10 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
 
         RecordBuilder::try_from(config)?
             .extract_from(&entry)?
-            .set_file_ext("html")
-            .add_filter(&|content| filters::adoc::filter(content, &css))?
+            .add_content_filter(&|content| filters::adoc::filter(content, &css))?
+            .add_record_filter(&|record| {
+                record.target_path = format!("{}.html", record.target_path);
+            })?
             .build()?
             .write()?;
     }

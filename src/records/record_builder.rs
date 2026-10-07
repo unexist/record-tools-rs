@@ -27,7 +27,6 @@ pub(crate) const DEFAULT_TITLE: &str = "No title given";
 const ATTR_NUMBER: &str = "NUMBER";
 const ATTR_TITLE: &str = "TITLE";
 const ATTR_DATE: &str = "DATE";
-const ATTR_FILE_EXT: &str = "FILE_EXT";
 
 pub(crate) type RecordAttributes = HashMap<String, String>;
 
@@ -35,7 +34,8 @@ pub(crate) type RecordAttributes = HashMap<String, String>;
 pub(crate) struct RecordBuilder<'a> {
     pub(crate) config: Option<&'a Config>,
     pub(crate) attrs: RecordAttributes,
-    pub(crate) filters: Vec<&'a dyn Fn(&String) -> Result<String>>,
+    pub(crate) content_filters: Vec<&'a dyn Fn(&String) -> Result<String>>,
+    pub(crate) record_filters: Vec<&'a dyn Fn(&mut Record)>,
 }
 
 impl<'a> TryFrom<&'a Config> for RecordBuilder<'a> {
@@ -157,19 +157,6 @@ impl<'a> RecordBuilder<'a> {
         )
     }
 
-    /// Set the file ext of the rendered file
-    ///
-    /// # Arguments
-    ///
-    /// * `file_ext` - Title to set for this record
-
-    /// # Returns
-    ///
-    /// An instance of [`RecordBuilder`]
-    pub(crate) fn set_file_ext(self, file_ext: &str) -> RecordBuilder<'a> {
-        self.set_attr(ATTR_FILE_EXT, file_ext)
-    }
-
     /// Extract record attributes based on the original template
     ///
     /// # Arguments
@@ -242,6 +229,24 @@ impl<'a> RecordBuilder<'a> {
         Ok(self)
     }
 
+    /// Add a content filter to the filter chain
+    ///
+    /// # Arguments
+    ///
+    /// * `filter_func` - Filter func to call
+    ///
+    /// # Returns
+    ///
+    /// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
+    pub(crate) fn add_content_filter(
+        &mut self,
+        filter_func: &'a impl Fn(&String) -> Result<String>,
+    ) -> Result<&mut Self> {
+        self.content_filters.push(filter_func);
+
+        Ok(self)
+    }
+
     /// Add a filter to the filter chain
     ///
     /// # Arguments
@@ -251,11 +256,11 @@ impl<'a> RecordBuilder<'a> {
     /// # Returns
     ///
     /// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn add_filter(
+    pub(crate) fn add_record_filter(
         &mut self,
-        filter_func: &'a impl Fn(&String) -> Result<String>,
+        filter_func: &'a impl Fn(&mut Record),
     ) -> Result<&mut Self> {
-        self.filters.push(filter_func);
+        self.record_filters.push(filter_func);
 
         Ok(self)
     }
@@ -270,11 +275,6 @@ impl<'a> RecordBuilder<'a> {
     pub(crate) fn build(&mut self) -> Result<Record> {
         let mut content =
             std::fs::read_to_string(self.config.unwrap().get_default_template_path()?)?;
-
-        // Apply filters
-        for filter in &self.filters {
-            content = filter(&content)?;
-        }
 
         // Sanitize record number
         let mut num = 0;
@@ -292,19 +292,28 @@ impl<'a> RecordBuilder<'a> {
 
         debug!("Using attributes {:?}", self.attrs);
 
-        Ok(Record {
+        // Apply content filters
+        for filter in &self.content_filters {
+            content = filter(&content)?;
+        }
+
+        let mut record = Record {
             content: replace_all(&content, &self.attrs)?,
             target_path: format!(
                 "{}/{:04}-{}.{}",
                 self.config.unwrap().get_output_path()?.display(),
                 num,
                 slugify!(self.get_title().context("Title cannot be empty")?),
-                match self.attrs.get(ATTR_FILE_EXT) {
-                    Some(ext) => ext,
-                    None => &self.config.unwrap().doc_type,
-                }
+                &self.config.unwrap().doc_type,
             ),
-        })
+        };
+
+        // Apply record filters
+        for filter in &self.record_filters {
+            filter(&mut record);
+        }
+
+        Ok(record)
     }
 }
 
