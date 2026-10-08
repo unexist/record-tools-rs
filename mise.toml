@@ -20,6 +20,9 @@ run = "cargo run"
 [tasks.adoc]
 run = "cargo run -- compile --output-dir=./records/html --output-type=adoc"
 
+[tasks.digraph]
+run = "cargo run -- digraph --output-dir=./records/html --output-type=adoc"
+
 [tasks.clean]
 run = "cargo clean"
 
