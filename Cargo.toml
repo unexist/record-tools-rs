@@ -40,7 +40,7 @@ tempfile = "3.27.0"
 [features]
 default = ["asciidoc", "markdown"]
 asciidoc = ["asciidocr"]
-markdown = ["markdown"]
+markdown = ["dep:markdown"]
 
 [[bin]]
 name = "rtrs"
