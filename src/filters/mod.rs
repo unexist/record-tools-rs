@@ -9,4 +9,8 @@
 //! See the file LICENSE for details.
 //!
 
-pub(crate) mod adoc;
+#[cfg(feature = "asciidoc")]
+pub(crate) mod asciidoc;
+
+#[cfg(feature = "markdown")]
+pub(crate) mod markdown;
