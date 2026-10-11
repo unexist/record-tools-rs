@@ -14,6 +14,7 @@ use crate::{Config, filters};
 use anyhow::Result;
 use log::{debug, info};
 use std::{fs, io};
+use tap::Pipe;
 
 /// Execute command
 ///
@@ -35,14 +36,20 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
 
     entries.sort();
 
-    let css = config.get_css_skin()?;
-
     for entry in entries {
         info!("Reading record file {:?}", entry);
 
         RecordBuilder::try_from(config)?
             .extract_from(&entry)?
-            .add_content_filter(&|content| filters::adoc::filter(content, &css))?
+            .pipe_borrow_mut(|builder| {
+                if cfg!(feature = "asciidoc") && "adoc" == config.output_type {
+                    builder.add_content_filter(&filters::asciidoc::filter)
+                } else if cfg!(feature = "markdown") && "md" == config.output_type {
+                    builder.add_content_filter(&filters::markdown::filter)
+                } else {
+                    Ok(builder)
+                }
+            })?
             .add_record_filter(&|record| {
                 record.target_path = format!("{}.html", record.target_path);
             })?
