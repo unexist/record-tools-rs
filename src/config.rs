@@ -11,13 +11,9 @@
 
 use anyhow::{Context, Result, bail};
 use clap_config_file::ClapConfigFile;
-use log::debug;
 use std::collections::HashMap;
 use std::env;
 use std::path::PathBuf;
-
-const GITHUB_SKIN_URL: &'static str =
-    "https://raw.githubusercontent.com/darshandsoni/asciidoctor-skins/refs/heads/gh-pages/css";
 
 #[derive(ClapConfigFile)]
 #[config_file_name = "config"]
@@ -87,10 +83,6 @@ pub(crate) struct Config {
     /// Just run and don't create files
     #[config_arg(accept_from = "cli_only")]
     pub(crate) dry_run: bool,
-
-    /// Try to fetch skin from <https://github.com/darshandsoni/asciidoctor-skins>
-    #[config_arg(default_value = "asciidoctor", accept_from = "cli_only")]
-    pub(crate) skin_name: String,
 
     #[config_arg(positional)]
     pub(crate) commands: Vec<String>,
@@ -178,18 +170,5 @@ impl Config {
         }
 
         bail!("No record type found");
-    }
-
-    /// Get css skin of given name
-    ///
-    /// # Returns
-    ///
-    /// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
-    pub(crate) fn get_css_skin(&self) -> Result<String> {
-        debug!("Fetching `{}/{}.css`", GITHUB_SKIN_URL, self.skin_name);
-
-        reqwest::blocking::get(format!("{}/{}.css", GITHUB_SKIN_URL, self.skin_name))?
-            .text()
-            .map_err(anyhow::Error::from)
     }
 }

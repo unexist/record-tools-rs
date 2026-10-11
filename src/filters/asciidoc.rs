@@ -14,6 +14,23 @@ use asciidocr::{backends::htmls::render_htmlbook, parser::Parser, scanner::Scann
 use log::{debug, info};
 use std::env;
 
+const GITHUB_SKIN_URL: &'static str =
+    "https://raw.githubusercontent.com/darshandsoni/asciidoctor-skins/refs/heads/gh-pages/css";
+
+/// Get css skin of given name
+///
+/// # Returns
+///
+/// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
+fn fetch_css_skin(skin_name: &str) -> Result<String> {
+    debug!("Fetching `{}/{}.css`", GITHUB_SKIN_URL, skin_name);
+
+    // Try to fetch skin from <https://github.com/darshandsoni/asciidoctor-skins>
+    reqwest::blocking::get(format!("{}/{}.css", GITHUB_SKIN_URL, skin_name))?
+        .text()
+        .map_err(anyhow::Error::from)
+}
+
 /// Execute command
 ///
 /// # Arguments
@@ -23,7 +40,7 @@ use std::env;
 /// # Returns
 ///
 /// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
-pub(crate) fn filter(content: &String, css: &str) -> Result<String> {
+pub(crate) fn filter(content: &String) -> Result<String> {
     let mut html_content: String = String::new();
 
     info!("Converting adoc to html");
@@ -37,7 +54,7 @@ pub(crate) fn filter(content: &String, css: &str) -> Result<String> {
                 &format!(
                     r#"<style type="text/css">{}</style>
 </head>"#,
-                    css,
+                    fetch_css_skin("asciidoctor")?,
                 ),
             );
 
