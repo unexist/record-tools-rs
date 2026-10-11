@@ -21,7 +21,7 @@ use log::info;
 /// # Returns
 ///
 /// A [`Result`] with either [`String`] on success or otherwise [`anyhow::Error`]
-pub(crate) fn filter(content: &String, _css: &str) -> Result<String> {
+pub(crate) fn filter(content: &String) -> Result<String> {
     info!("Converting markdown to html");
 
     Ok(markdown::to_html(content))
