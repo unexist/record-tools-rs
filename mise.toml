@@ -20,6 +20,9 @@ run = "cargo run"
 [tasks.adoc]
 run = "cargo run -- compile --output-dir=./records/html --output-type=adoc"
 
+[tasks.md]
+run = "cargo run -- compile --output-dir=./records/html --output-type=md"
+
 [tasks.digraph]
 run = "cargo run -- digraph --output-dir=./records/html --output-type=adoc"
 
@@ -45,3 +48,6 @@ run = '''
 
 [tasks.clippy]
 run = "bacon clippy"
+
+[tasks.open]
+run = "open records/html/0001-no-title-given.adoc.html"
