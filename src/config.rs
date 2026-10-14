@@ -36,9 +36,9 @@ pub(crate) struct Config {
     #[config_arg(short = 'q', default_value = false, accept_from = "cli_only")]
     pub(crate) quiet: bool,
 
-    /// Record file type
-    #[config_arg(short = 'd', name = "doc_type", default_value = "adoc")]
-    pub(crate) doc_type: String,
+    /// Record file input type
+    #[config_arg(short = 'i', name = "input-type", default_value = "adoc")]
+    pub(crate) input_type: String,
 
     /// Path to templates
     #[config_arg(default_value = "./templates")]
@@ -48,7 +48,7 @@ pub(crate) struct Config {
     #[config_arg(short = 'o', default_value = ".")]
     pub(crate) output_dir: String,
 
-    /// Record file type
+    /// Record file output type
     #[config_arg(short = 'O', name = "output-type", default_value = "adoc")]
     pub(crate) output_type: String,
 
@@ -144,7 +144,7 @@ impl Config {
 
                 return Ok(PathBuf::from(format!(
                     "{}/{}.{}",
-                    self.template_dir, template_name, self.doc_type
+                    self.template_dir, template_name, self.input_type
                 )));
             }
         }
