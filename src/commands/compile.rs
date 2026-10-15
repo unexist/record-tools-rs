@@ -13,7 +13,8 @@ use crate::records::record_builder::RecordBuilder;
 use crate::{Config, filters};
 use anyhow::Result;
 use log::{debug, info};
-use std::{fs, io};
+use std::fs;
+use std::path::PathBuf;
 use tap::Pipe;
 
 /// Execute command
@@ -31,8 +32,20 @@ pub(crate) fn execute(config: &Config) -> Result<()> {
 
     // Load and sort entries
     let mut entries = fs::read_dir(config.get_record_path()?)?
-        .map(|res| res.map(|e| e.path()))
-        .collect::<Result<Vec<_>, io::Error>>()?;
+        .filter_map(|e| {
+            e.ok().and_then(|d| {
+                let p = d.path();
+
+                if let Some(ext) = p.extension()
+                    && ext.eq_ignore_ascii_case(&config.input_type)
+                {
+                    Some(p)
+                } else {
+                    None
+                }
+            })
+        })
+        .collect::<Vec<PathBuf>>();
 
     entries.sort();
 
